@@ -14,7 +14,7 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 data_dir = os.path.join(base_dir, 'data')
 images_dir = os.path.join(base_dir, 'static', 'images')
 log_file = os.path.join(data_dir, 'test_log.csv')
-points_file = os.path.join(data_dir,'test_points.csv')
+points_file = os.path.join(data_dir,'points.csv')
 
 # Ensure directories exist
 os.makedirs(images_dir, exist_ok=True)
@@ -135,7 +135,7 @@ def calc_points(hoh_winners, veto_winners, off_block, other_comp_winners, evicti
                     weekly_scores[player][week] += points
                     log_points(player, points, f"{picks[player][ranking]} won buy back", week)
 
-        if len(evictions) == 17 + len(buy_back):
+        if len(evictions) == 16 + len(buy_back):
             if picks[player] == evictions[::-1]:
                 points = 100
                 weekly_scores[player][-1] += points
@@ -294,8 +294,8 @@ def plot_scores_over_time(weekly_scores):
     plt.close()
 
 # Load data
-picks_headers, picks = read_picks_from_csv(os.path.join(data_dir, 'test_picks.csv'))
-hoh_winners, veto_winners, off_block, other_comp_winners, evictions, buy_back, americas_favorite = read_winners_from_csv(os.path.join(data_dir, 'test_winners.csv'))
+picks_headers, picks = read_picks_from_csv(os.path.join(data_dir, 'picks.csv'))
+hoh_winners, veto_winners, off_block, other_comp_winners, evictions, buy_back, americas_favorite = read_winners_from_csv(os.path.join(data_dir, 'winners.csv'))
 
 # Calculate points
 weekly_scores, total_scores = calc_points(hoh_winners, veto_winners, off_block, other_comp_winners, evictions, americas_favorite, buy_back, picks)
@@ -316,9 +316,9 @@ def read_raw_data_from_csv(filename):
         print(f"Error reading {filename}: {e}")
     return data
 
-picks_data = read_raw_data_from_csv(os.path.join(data_dir, 'test_picks.csv'))
-points_headers, points_data = read_points_from_csv(os.path.join(data_dir, 'test_points.csv'))
-winners_data_str = read_raw_data_from_csv(os.path.join(data_dir, 'test_winners.csv'))
+picks_data = read_raw_data_from_csv(os.path.join(data_dir, 'picks.csv'))
+points_headers, points_data = read_points_from_csv(os.path.join(data_dir, 'points.csv'))
+winners_data_str = read_raw_data_from_csv(os.path.join(data_dir, 'winners.csv'))
 
 @app.route('/', methods=['GET'])
 def index():
