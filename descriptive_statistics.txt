@@ -1,0 +1,154 @@
+Luke:
+  Mean: 8.285714285714286
+  Median: 9.0
+  Mode: No mode
+  Standard Deviation: 4.542318027309899
+  Range: 15
+  Outliers: 0
+
+Cirie:
+  Mean: 9.066666666666666
+  Median: 8.0
+  Mode: No mode
+  Standard Deviation: 5.039400317057136
+  Range: 15
+  Outliers: 0
+
+Jag:
+  Mean: 10.714285714285714
+  Median: 10.5
+  Mode: No mode
+  Standard Deviation: 3.633742097707687
+  Range: 11
+  Outliers: 0
+
+Kirsten:
+  Mean: 11.923076923076923
+  Median: 13.0
+  Mode: No mode
+  Standard Deviation: 3.689101171779015
+  Range: 10
+  Outliers: 0
+
+Reilly:
+  Mean: 10.642857142857142
+  Median: 11.0
+  Mode: No mode
+  Standard Deviation: 2.9666513796135985
+  Range: 10
+  Outliers: 0
+
+Matt:
+  Mean: 10.76923076923077
+  Median: 13.0
+  Mode: No mode
+  Standard Deviation: 4.060197913968199
+  Range: 15
+  Outliers: 0
+
+Jared:
+  Mean: 11.8
+  Median: 12.0
+  Mode: No mode
+  Standard Deviation: 2.9709706606876254
+  Range: 11
+  Outliers: 0
+
+Bowie:
+  Mean: 5.928571428571429
+  Median: 4.5
+  Mode: No mode
+  Standard Deviation: 3.2615571590945356
+  Range: 12
+  Outliers: 0
+
+America:
+  Mean: 7.133333333333334
+  Median: 7.0
+  Mode: No mode
+  Standard Deviation: 2.94089933334837
+  Range: 10
+  Outliers: 0
+
+Cory:
+  Mean: 8.4
+  Median: 9.0
+  Mode: No mode
+  Standard Deviation: 4.029888335921977
+  Range: 11
+  Outliers: 0
+
+Mecole:
+  Mean: 10.538461538461538
+  Median: 10.0
+  Mode: No mode
+  Standard Deviation: 4.143862646509425
+  Range: 13
+  Outliers: 0
+
+Blue:
+  Mean: 7.933333333333334
+  Median: 8.0
+  Mode: No mode
+  Standard Deviation: 4.1063636251825315
+  Range: 14
+  Outliers: 0
+
+Red:
+  Mean: 6.866666666666666
+  Median: 6.0
+  Mode: No mode
+  Standard Deviation: 4.602414825091521
+  Range: 15
+  Outliers: 0
+
+Cameron:
+  Mean: 7.6923076923076925
+  Median: 10.0
+  Mode: No mode
+  Standard Deviation: 5.013590995938561
+  Range: 14
+  Outliers: 0
+
+Izzy:
+  Mean: 5.266666666666667
+  Median: 5.0
+  Mode: No mode
+  Standard Deviation: 3.906689419728963
+  Range: 15
+  Outliers: 0
+
+Felicia:
+  Mean: 3.7333333333333334
+  Median: 3.0
+  Mode: No mode
+  Standard Deviation: 3.6962443401677625
+  Range: 13
+  Outliers: 0
+
+Hisam:
+  Mean: 7.8
+  Median: 7.0
+  Mode: No mode
+  Standard Deviation: 4.445222154178573
+  Range: 15
+  Outliers: 0
+
+Average List:
+Felicia: 3.7333333333333334
+Izzy: 5.266666666666667
+Bowie: 5.928571428571429
+Red: 6.866666666666666
+America: 7.133333333333334
+Cameron: 7.6923076923076925
+Hisam: 7.8
+Blue: 7.933333333333334
+Luke: 8.285714285714286
+Cory: 8.4
+Cirie: 9.066666666666666
+Mecole: 10.538461538461538
+Reilly: 10.642857142857142
+Jag: 10.714285714285714
+Matt: 10.76923076923077
+Jared: 11.8
+Kirsten: 11.923076923076923

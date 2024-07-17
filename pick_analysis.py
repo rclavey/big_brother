@@ -1,71 +1,94 @@
 import pandas as pd
 import numpy as np
+import scipy.stats as stats
 import matplotlib.pyplot as plt
-from scipy import stats
 
-# Read the CSV file
-file_path = '/Users/richie/Documents/git_hub/big_brother/big_brother/data/test_points.csv'
-data = pd.read_csv(file_path)
+# Load the picks data
+picks_file = '/Users/richie/Documents/git_hub/big_brother/big_brother/data/test_picks.csv'
+picks_df = pd.read_csv(picks_file)
 
-# Remove the 'name' column for analysis
-contestant_columns = data.columns[1:]
+# Remove the first column (names)
+picks_df = picks_df.drop(columns=['name'])
 
-# Prepare a dictionary to store descriptive statistics
+# Get the number of contestants
+num_contestants = picks_df.shape[1]
+
+# Initialize a dictionary to store the descriptive statistics
 descriptive_stats = {}
 
-# Calculate descriptive statistics for each contestant
-for contestant in contestant_columns:
-    ranks = data[contestant]
+# Initialize a list to store the average ranking for each contestant
+average_list = []
+
+# Function to detect outliers
+def detect_outliers(data):
+    z_scores = stats.zscore(data)
+    return np.where(np.abs(z_scores) > 3)[0]  # Indices of outliers
+
+# Flatten the DataFrame to get a list of all unique contestants
+contestants = picks_df.values.flatten()
+unique_contestants = pd.unique(contestants)
+
+# Process the ranking for each contestant
+for contestant in unique_contestants:
+    ranks = []
+    for index, row in picks_df.iterrows():
+        if contestant in row.values:
+            rank = num_contestants - row.values.tolist().index(contestant)
+            ranks.append(rank)
+    
+    if len(ranks) == 0:
+        continue
+    
     mean_rank = np.mean(ranks)
     median_rank = np.median(ranks)
-    mode_rank = stats.mode(ranks)[0][0]
-    std_dev_rank = np.std(ranks)
+    mode_result = stats.mode(ranks)
+    mode_rank = mode_result.mode[0] if isinstance(mode_result.mode, np.ndarray) and mode_result.mode.size > 0 else 'No mode'
+    std_dev = np.std(ranks)
     range_rank = np.ptp(ranks)
-    outliers = ranks[(np.abs(stats.zscore(ranks)) > 3)]
-    
+    outliers = detect_outliers(ranks)
+    num_outliers = len(outliers)
+
     descriptive_stats[contestant] = {
         'Mean': mean_rank,
         'Median': median_rank,
         'Mode': mode_rank,
-        'Standard Deviation': std_dev_rank,
+        'Standard Deviation': std_dev,
         'Range': range_rank,
-        'Outliers': outliers.tolist()
+        'Outliers': num_outliers
     }
 
-# Generate average list
-average_list = data[contestant_columns].mean().sort_values().index.tolist()
-average_list_with_scores = data[contestant_columns].mean().sort_values().tolist()
+    # Add to average list
+    average_list.append((contestant, mean_rank))
 
-# Write the statistics and lists to a text file
-with open('descriptive_stats.txt', 'w') as file:
+# Sort the average list by the average ranking
+average_list.sort(key=lambda x: x[1])
+
+# Write the results to a text file
+with open('descriptive_statistics.txt', 'w') as file:
     for contestant, stats in descriptive_stats.items():
         file.write(f"{contestant}:\n")
-        file.write(f"  Mean Placement: {stats['Mean']}\n")
-        file.write(f"  Median Placement: {stats['Median']}\n")
-        file.write(f"  Mode Placement: {stats['Mode']}\n")
-        file.write(f"  Standard Deviation: {stats['Standard Deviation']}\n")
-        file.write(f"  Range: {stats['Range']}\n")
-        file.write(f"  Outliers: {stats['Outliers']}\n")
+        for stat, value in stats.items():
+            file.write(f"  {stat}: {value}\n")
         file.write("\n")
-    
-    file.write("Average List:\n")
-    file.write(", ".join(average_list) + "\n\n")
-    
-    file.write("Average List with Scores:\n")
-    for name, score in zip(average_list, average_list_with_scores):
-        file.write(f"{name}: {score}\n")
-    
-# Plot graphs for each contestant
-for contestant in contestant_columns:
-    ranks = data[contestant]
-    plt.figure(figsize=(10, 6))
-    plt.hist(ranks, bins=np.arange(1, 19)-0.5, edgecolor='black')
-    plt.title(f'Distribution of Rankings for {contestant}')
-    plt.xlabel('Rank')
-    plt.ylabel('Frequency')
-    plt.xticks(np.arange(1, 18))
-    plt.grid(axis='y')
-    plt.savefig(f'{contestant}_rank_distribution.png')
-    plt.close()
 
-print("Descriptive statistics and graphs have been saved.")
+    file.write("Average List:\n")
+    for contestant, avg_rank in average_list:
+        file.write(f"{contestant}: {avg_rank}\n")
+
+# Plot the rankings
+plt.figure(figsize=(10, 6))
+for contestant in descriptive_stats.keys():
+    ranks = []
+    for index, row in picks_df.iterrows():
+        if contestant in row.values:
+            rank = num_contestants - row.values.tolist().index(contestant)
+            ranks.append(rank)
+    print(f"{contestant} got the following ranks:{ranks}")
+    plt.plot(ranks, label=contestant)
+
+plt.xlabel('Participants')
+plt.ylabel('Rank')
+plt.title('Ranking of Contestants')
+plt.legend()
+plt.savefig('rankings_plot.png')
+
