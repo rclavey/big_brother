@@ -64,12 +64,27 @@ def read_winners_from_csv(filename):
     other_comp_winners_raw = [x for x in data[3][1:] if x != '']
     evictions = [x for x in data[4][1:] if x != ''] 
     
-    # parse didnt_lose dictionary
-    other_comp_winners = {int(other_comp_winners_raw[i]): (other_comp_winners_raw[i+1]) for i in range(0, len(other_comp_winners_raw), 2) if other_comp_winners_raw[i].isdigit()}
+    # Parse other_comp_winners as a dictionary of lists
+    other_comp_winners = {}
+    for i in range(0, len(other_comp_winners_raw), 2):
+        week = int(other_comp_winners_raw[i])
+        winners = other_comp_winners_raw[i + 1].split(',')  # Split multiple winners
+        if week in other_comp_winners:
+            other_comp_winners[week].extend(winners)
+        else:
+            other_comp_winners[week] = winners
+    print(other_comp_winners)
     
-    # parse the buy_back dictionary
-    buy_back_raw = [x for x in data[5][1:] if x != ''] 
-    buy_back = {int(buy_back_raw[i]): (buy_back_raw[i+1]) for i in range(0, len(buy_back_raw), 2) if buy_back_raw[i].isdigit()}
+    # Parse buy_back as a dictionary of lists
+    buy_back_raw = [x for x in data[5][1:] if x != '']
+    buy_back = {}
+    for i in range(0, len(buy_back_raw), 2):
+        week = int(buy_back_raw[i])
+        winners = buy_back_raw[i + 1].split(',')  # Split multiple winners
+        if week in buy_back:
+            buy_back[week].extend(winners)
+        else:
+            buy_back[week] = winners
 
     americas_favorite = data[6][1] 
     
@@ -120,13 +135,16 @@ def calc_points(hoh_winners, veto_winners, off_block, other_comp_winners, evicti
                     points = 7.5 - (ranking * 0.75)
                     weekly_scores[player][index_of_winner] += points
                     log_points(player, points, f"{picks[player][ranking]} got off the block", index_of_winner)
-
-        for week, winner in other_comp_winners.items():
-            for ranking in range(len(picks[player])):
-                if picks[player][ranking] == winner:
-                    points = 5 - (ranking * 0.5)
-                    weekly_scores[player][week] += points
-                    log_points(player, points, f"{picks[player][ranking]} won another competition", week)
+                    
+        for week, winners in other_comp_winners.items():
+            if not isinstance(winners, list):
+                winners = [winners]
+            for winner in winners:
+                for ranking in range(len(picks[player])):
+                    if picks[player][ranking] == winner:
+                        points = 5 - (ranking * 0.5)
+                        weekly_scores[player][week] += points
+                        log_points(player, points, f"{picks[player][ranking]} won another competition", week)
 
         for week, winner in buy_back.items():
             for ranking in range(len(picks[player])):

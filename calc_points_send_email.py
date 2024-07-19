@@ -276,18 +276,20 @@ def send_email_with_attachments(subject, body, to, email, password, files):
 # execute the code
 if __name__ == '__main__':
     # get picks from csv file
-    csv_picks = read_picks_from_csv('picks.csv')
+    csv_picks = read_picks_from_csv('/Users/richie/Documents/git_hub/big_brother/big_brother/data/picks.csv')
     # get winners from csv file
-    hoh_winners_csv, veto_winners_csv, off_block_csv, other_comp_winners_csv, evictions_csv, buy_back_csv, americas_favorite_csv  = read_winners_from_csv('winners.csv')
+    hoh_winners_csv, veto_winners_csv, off_block_csv, other_comp_winners_csv, evictions_csv, buy_back_csv, americas_favorite_csv  = read_winners_from_csv('/Users/richie/Documents/git_hub/big_brother/big_brother/data/winners.csv')
     # get scores from calc_points function
     weekly_scores, total_scores = calc_points(hoh_winners_csv, veto_winners_csv, off_block_csv, other_comp_winners_csv, evictions_csv,americas_favorite_csv, buy_back_csv,csv_picks)
     # write the scores to the csv file
-    write_scores_to_csv('points.csv', total_scores, weekly_scores)
+    write_scores_to_csv('/Users/richie/Documents/git_hub/big_brother/big_brother/data/new_points.csv', total_scores, weekly_scores)
     print('Points have been calculated.')
     # plot the total scores as well as the cumulative weekly scores
     plot_total_scores(total_scores)
     plot_scores_over_time(weekly_scores)
     print('Points have been graphed.')
+
+    '''
     # email the update to everyone in the email list
     files = ['cumulative_scores.png', 'total_scores.png', 'picks.csv', 'points.csv', 'winners.csv']
     subject = "Big Brother 25 Draft"
@@ -297,6 +299,7 @@ if __name__ == '__main__':
     password = 'redacted'
     # send the email
     #send_email_with_attachments(subject, body, to, email, password, files)
+'''
 
 '''
 Useful copy and pastes:ss
