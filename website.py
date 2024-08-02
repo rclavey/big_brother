@@ -60,9 +60,21 @@ def read_winners_from_csv(filename):
 
     hoh_winners = [x for x in data[0][1:] if x != '']
     veto_winners = [x for x in data[1][1:] if x != '']
-    off_block = [x for x in data[2][1:] if x != ''] 
+    
     other_comp_winners_raw = [x for x in data[3][1:] if x != '']
     evictions = [x for x in data[4][1:] if x != ''] 
+    
+    # Parse off_block as a dictionary of lists
+    off_block_raw = [x for x in data[2][1:] if x != '']
+    off_block = {}
+    for i in range(0, len(off_block_raw), 2):
+        week = int(off_block_raw[i])
+        players = off_block_raw[i + 1].split(',')  # Split multiple players
+        if week in off_block:
+            off_block[week].extend(players)
+        else:
+            off_block[week] = players
+    print(off_block)
     
     # Parse other_comp_winners as a dictionary of lists
     other_comp_winners = {}
@@ -74,7 +86,7 @@ def read_winners_from_csv(filename):
         else:
             other_comp_winners[week] = winners
     print(other_comp_winners)
-    
+
     # Parse buy_back as a dictionary of lists
     buy_back_raw = [x for x in data[5][1:] if x != '']
     buy_back = {}
@@ -129,13 +141,16 @@ def calc_points(hoh_winners, veto_winners, off_block, other_comp_winners, evicti
                     weekly_scores[player][index_of_winner] += points
                     log_points(player, points, f"{picks[player][ranking]} won Veto", index_of_winner)
 
-        for index_of_winner in range(len(off_block)):
-            for ranking in range(len(picks[player])):
-                if picks[player][ranking] == off_block[index_of_winner]:
-                    points = 7.5 - (ranking * 0.75)
-                    weekly_scores[player][index_of_winner] += points
-                    log_points(player, points, f"{picks[player][ranking]} got off the block", index_of_winner)
-                    
+                for week, players in off_block.items():
+                    if not isinstance(players, list):
+                        players = [players]
+                    for off_block_player in players:
+                        for ranking in range(len(picks[player])):
+                            if picks[player][ranking] == off_block_player:
+                                points = 7.5 - (ranking * 0.75)
+                                weekly_scores[player][week] += points
+                                log_points(player, points, f"{picks[player][ranking]} got off the block", week)
+        
         for week, winners in other_comp_winners.items():
             if not isinstance(winners, list):
                 winners = [winners]
