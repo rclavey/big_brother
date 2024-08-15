@@ -123,7 +123,7 @@ def calc_points(hoh_winners, veto_winners, off_block, other_comp_winners, evicti
     points_log = []
 
     def log_points(player, points, reason, week):
-        action = "gained" if points > 0 else "lost"
+        action = "gained" if points >= 0 else "lost"
         points_log.append([f"{player} {action} {abs(points)} points because {reason} during week {week+1}."])
 
     for player in picks:
