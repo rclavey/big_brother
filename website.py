@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request
-from flask_socketio import SocketIO, send, emit
 import csv
 import matplotlib.pyplot as plt
 import os
@@ -7,7 +6,6 @@ import numpy as np
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
-socketio = SocketIO(app)
 
 # Define paths
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -19,8 +17,6 @@ points_file = os.path.join(data_dir,'points.csv')
 # Ensure directories exist
 os.makedirs(images_dir, exist_ok=True)
 
-# messages from the chat
-messages = []
 
 def read_logs_from_csv(filename):
     logs = {}
@@ -371,16 +367,5 @@ def index():
                            logs=logs,
                            player_names=player_names)  # Pass the player names and logs to the template
 
-@socketio.on('connect')
-def handle_connect():
-    for msg in messages:
-        emit('message', msg)
-
-@socketio.on('message')
-def handle_message(msg):
-    print('Message: ' + msg)
-    messages.append(msg)
-    send(msg, broadcast=True)
-
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5001, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)
