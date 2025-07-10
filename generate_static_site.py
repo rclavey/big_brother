@@ -160,7 +160,7 @@ def calc_points(hoh_winners, veto_winners, off_block, other_comp_winners, evicti
     for player in weekly_scores:
         total_scores[player] = sum(weekly_scores[player])
 
-    with open(os.path.join(DATA_DIR, 'test_log.csv'), 'w', newline='') as file:
+    with open(os.path.join(DATA_DIR, 'log.csv'), 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(points_log)
 
