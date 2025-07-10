@@ -253,7 +253,7 @@ def main():
     player_names = list(logs.keys())
     leaderboard = sorted(total_scores.items(), key=lambda x: x[1], reverse=True)
 
-    env = Environment(loader=FileSystemLoader(BASE_DIR))
+    env = Environment(loader=FileSystemLoader(os.path.join(BASE_DIR, 'templates')))
     template = env.get_template('index.html')
     html = template.render(
         total_scores_img='static/images/total_scores.png',
