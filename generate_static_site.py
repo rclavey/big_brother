@@ -226,10 +226,10 @@ def find_file(*names):
 
 
 def main():
-    picks_file = find_file('picks.csv', 'picks_26.csv', 'test_picks.csv')
-    winners_file = find_file('winners.csv', 'winners_26.csv', 'test_winners.csv')
-    points_file = find_file('points.csv', 'points_26.csv', 'test_points.csv')
-    log_file = find_file('log.csv', 'test_log.csv')
+    picks_file = find_file('picks.csv')
+    winners_file = find_file('winners.csv')
+    points_file = find_file('points.csv')
+    log_file = find_file('log.csv')
 
     picks_headers, picks = read_picks_from_csv(picks_file)
     hoh, veto, off_block, other_comp, evictions, buy_back, fav = read_winners_from_csv(winners_file)
