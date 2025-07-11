@@ -1,0 +1,145 @@
+Zach:
+  Mean: 12.25
+  Median: 13.0
+  Mode: No mode
+  Standard Deviation: 3.6314597615834874
+  Range: 12
+  Outliers: 0
+
+Morgan:
+  Mean: 10.866666666666667
+  Median: 11.0
+  Mode: No mode
+  Standard Deviation: 4.030991055421593
+  Range: 13
+  Outliers: 0
+
+Keanu:
+  Mean: 11.857142857142858
+  Median: 13.5
+  Mode: No mode
+  Standard Deviation: 3.9974481656094922
+  Range: 12
+  Outliers: 0
+
+Isaiah:
+  Mean: 11.466666666666667
+  Median: 11.0
+  Mode: No mode
+  Standard Deviation: 2.94089933334837
+  Range: 9
+  Outliers: 0
+
+Adrian:
+  Mean: 7.857142857142857
+  Median: 6.0
+  Mode: No mode
+  Standard Deviation: 4.323641700120445
+  Range: 14
+  Outliers: 0
+
+Clifton:
+  Mean: 6.866666666666666
+  Median: 7.0
+  Mode: No mode
+  Standard Deviation: 3.138293945583952
+  Range: 10
+  Outliers: 0
+
+Lauren:
+  Mean: 10.0
+  Median: 10.0
+  Mode: No mode
+  Standard Deviation: 2.804757862395017
+  Range: 8
+  Outliers: 0
+
+Jimmy:
+  Mean: 10.571428571428571
+  Median: 11.5
+  Mode: No mode
+  Standard Deviation: 4.836088822803074
+  Range: 14
+  Outliers: 0
+
+Ava:
+  Mean: 6.333333333333333
+  Median: 5.0
+  Mode: No mode
+  Standard Deviation: 3.893013685508383
+  Range: 12
+  Outliers: 0
+
+Vince:
+  Mean: 7.642857142857143
+  Median: 7.5
+  Mode: No mode
+  Standard Deviation: 3.9570397098470114
+  Range: 13
+  Outliers: 0
+
+Ashley:
+  Mean: 10.461538461538462
+  Median: 10.0
+  Mode: No mode
+  Standard Deviation: 4.482708395179528
+  Range: 13
+  Outliers: 0
+
+Mickey:
+  Mean: 8.6
+  Median: 8.0
+  Mode: No mode
+  Standard Deviation: 3.647830405414521
+  Range: 12
+  Outliers: 0
+
+Katherine:
+  Mean: 9.533333333333333
+  Median: 10.0
+  Mode: No mode
+  Standard Deviation: 4.302970550161313
+  Range: 14
+  Outliers: 0
+
+Kelley:
+  Mean: 6.666666666666667
+  Median: 7.0
+  Mode: No mode
+  Standard Deviation: 3.3796778281697533
+  Range: 12
+  Outliers: 0
+
+Amy:
+  Mean: 4.733333333333333
+  Median: 4.0
+  Mode: No mode
+  Standard Deviation: 3.2550814975289875
+  Range: 11
+  Outliers: 0
+
+Rylie:
+  Mean: 9.461538461538462
+  Median: 11.0
+  Mode: No mode
+  Standard Deviation: 3.713082580352975
+  Range: 13
+  Outliers: 0
+
+Average List:
+Amy: 4.733333333333333
+Ava: 6.333333333333333
+Kelley: 6.666666666666667
+Clifton: 6.866666666666666
+Vince: 7.642857142857143
+Adrian: 7.857142857142857
+Mickey: 8.6
+Rylie: 9.461538461538462
+Katherine: 9.533333333333333
+Lauren: 10.0
+Ashley: 10.461538461538462
+Jimmy: 10.571428571428571
+Morgan: 10.866666666666667
+Isaiah: 11.466666666666667
+Keanu: 11.857142857142858
+Zach: 12.25

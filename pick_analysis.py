@@ -4,7 +4,7 @@ import scipy.stats as stats
 import matplotlib.pyplot as plt
 
 # Load the picks data
-picks_file = '/Users/richie/Documents/git_hub/big_brother/big_brother/data/test_picks.csv'
+picks_file = '/Users/richie/big_brother/data/picks.csv'
 picks_df = pd.read_csv(picks_file)
 
 # Remove the first column (names)

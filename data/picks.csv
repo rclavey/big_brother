@@ -1,10 +1,10 @@
 name,contestant1,contestant2,contestant3,contestant4,contestant5,contestant6,contestant7,contestant8,contestant9,contestant10,contestant11,contestant12,contestant13,contestant14,contestant15,contestant16
-Richie,Rylie,Zach,Morgan,Isaiah,Keanu,Adrian,Clifton,Lauren,Jimmy,Ava,Vince,Ashley,Mickey,Katherine,Kelley,Amy
+Richie,Rylie,Zach,Morgan,Keanu,Isaiah,,Adrian,Clifton,Lauren,Jimmy,Ava,Vince,Ashley,Mickey,Katherine,Kelley,Amy
 Terri,Zach,Jimmy,Ashley,Isaiah,Keanu,Vince,Rylie,Mickey,Morgan,Ava,Lauren,Clifton,Adrian,Katherine,Kelley,Amy
 Karen,Zach,Adrian,Ashley,Jimmy,Clifton,Lauren,Kelley,Mickey,Isaiah,Rylie,Katherine,Morgan,Keanu,Amy,Vince,Ava
 Maggie,Adrian,Keanu,Isaiah,Katherine,Zach,Jimmy,Morgan,Mickey,Kelley,Amy,Clifton,Lauren,Ava,Vince,Ashley,Rylie
 Kirsten,Jimmy,Ashley,Katherine,Morgan,Lauren,Keanu,Amy,Zach,Kelley,Isaiah,Ava,Mickey,Adrian,Rylie,Clifton,Vince
-Bobby,
+Bobby,Zach,Ashley,Isaiah,Lauren,Rylie,Keanu,Morgan,Katherine,Clifton,Vince,Kelley,Mickey,Amy,Jimmy,Adrian,Ava
 Danielle,Ashley,Morgan,Vince,Kelley,Zach,Katherine,Rylie,Jimmy,Ava,Keanu,Lauren,Isaiah,Clifton,Mickey,Amy,Adrian
 Dee,Zach,Katherine,Rylie,Keanu,Isaiah,Morgan,Lauren,Ava,Kelley,Mickey,Jimmy,Vince,Ashley,Adrian,Clifton,Amy
 Steph,Ashley,Jimmy,Morgan,Ava,Rylie,Amy,Isaiah,Lauren,Mickey,Katherine,Keanu,Adrian,Kelley,Zach,Clifton,Vince
@@ -13,4 +13,6 @@ Sharon,Zach,Keanu,Adrian,Katherine,Vince,Rylie,Isaiah,Clifton,Lauren,Morgan,Mick
 Anmol,Rylie,Zach,Keanu,Ashley,Lauren,Adrian,Katherine,Isaiah,Vince,Clifton,Amy,Mickey,Kelley,Ava,Morgan,Jimmy
 Caroline,Zach,Keanu,Mickey,Jimmy,Ashley,Morgan,Rylie,Vince,Katherine,Isaiah,Adrian,Lauren,Clifton,Ava,Kelley,Amy
 Bern,Vince,Jimmy,Isaiah,Zach,Lauren,Katherine,Morgan,Rylie,Ashley,Kelley,Clifton,Adrian,Mickey,Keanu,Ava,Amy
-Joe,Zach,Morgan,Zae,Keanu,Mickey,Adrian,Jimmy,Vince,Ashley,Rylie,Lauren,Katherine,Kelley,Amy,Clifton,Ava
+Joe,Zach,Morgan,Isaiah,Keanu,Mickey,Adrian,Jimmy,Vince,Ashley,Rylie,Lauren,Katherine,Kelley,Amy,Clifton,Ava
+Average,Zach,Keanu,Isaiah,Morgan,Jimmy,Ashley,Lauren,Katherine,Rylie,Mickey,Adrian,Vince,Clifton,Kelley,Ava,Amy
+ChatGPT,Ashley,Morgan,Katherine,Zach,Lauren,Isaiah,Vince,Keanu,Adrian,Clifton,Jimmy,Ava,Rylie,Mickey,Amy,Kelley
