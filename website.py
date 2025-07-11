@@ -164,7 +164,7 @@ def calc_points(hoh_winners, veto_winners, off_block, other_comp_winners, evicti
                     weekly_scores[player][week] += points
                     log_points(player, points, f"{picks[player][ranking]} won buy back", week)
 
-        if len(evictions) == 16 + len(buy_back):
+        if len(evictions) == 17 + len(buy_back):
             if picks[player] == evictions[::-1]:
                 points = 100
                 weekly_scores[player][-1] += points
