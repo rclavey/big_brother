@@ -53,7 +53,7 @@ def calc_points(hoh_winners=list, veto_winners=list, off_block=list, other_comp_
     # the plus one after len(hoh_winners) was added because of a twist regarding two vetos in one week, delete after bb25
     weekly_scores = {player: [0] * (len(hoh_winners) + 1) for player in picks.keys()}
     total_scores = {player: 0 for player in picks.keys()}
-
+    number_of_players = 17
     # iterate through all players in the game
     for player in picks:
 
@@ -98,7 +98,7 @@ def calc_points(hoh_winners=list, veto_winners=list, off_block=list, other_comp_
                     weekly_scores[player][week] += 10 - ranking
         
         # at the end of the game
-        if len(evictions) == 17 + len(buy_back): # add one to 16 if there was a buy-back because that person will be evicted twice
+        if len(evictions) == number_of_players + len(buy_back): # add one to 16 if there was a buy-back because that person will be evicted twice
             # see if the eviction list exactly matches someone's guesses and award a bonus
             if picks[player] == evictions[::-1]:
                 weekly_scores[player][-1] += 100

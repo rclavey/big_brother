@@ -95,6 +95,7 @@ def calc_points(hoh_winners, veto_winners, off_block, other_comp_winners, evicti
     weekly_scores = {player: [0] * (len(hoh_winners) + 1) for player in picks}
     total_scores = {player: 0 for player in picks}
     points_log = []
+    number_of_players = 17 # change if number of players is different than last season
 
     def log_points(player, points, reason, week):
         action = "gained" if points >= 0 else "lost"
@@ -139,7 +140,7 @@ def calc_points(hoh_winners, veto_winners, off_block, other_comp_winners, evicti
                         weekly_scores[player][week] += points
                         log_points(player, points, f"{pick} won buy back", week)
 
-        if len(evictions) == 17 + len(buy_back):
+        if len(evictions) == number_of_players + len(buy_back):
             if picks[player] == evictions[::-1]:
                 points = 100
                 weekly_scores[player][-1] += points
