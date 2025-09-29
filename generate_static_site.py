@@ -158,6 +158,87 @@ def calc_points(hoh_winners, veto_winners, off_block, other_comp_winners, evicti
             elif picks[player][-3] == americas_favorite:
                 weekly_scores[player][-1] -= 10
 
+            final_week_index = len(hoh_winners)
+
+            season_winner = evictions[-1]
+            if picks[player][0] == season_winner:
+                points = 100
+                weekly_scores[player][-1] += points
+                log_points(player, points, f"{season_winner} won the season and you ranked them first", final_week_index)
+            elif picks[player][1] == season_winner:
+                points = 75
+                weekly_scores[player][-1] += points
+                log_points(player, points, f"{season_winner} won the season and you ranked them second", final_week_index)
+            elif picks[player][2] == season_winner:
+                points = 50
+                weekly_scores[player][-1] += points
+                log_points(player, points, f"{season_winner} won the season and you ranked them third", final_week_index)
+            elif picks[player][-1] == season_winner:
+                points = -75
+                weekly_scores[player][-1] += points
+                log_points(player, points, f"{season_winner} won the season but you ranked them last", final_week_index)
+            elif picks[player][-2] == season_winner:
+                points = -50
+                weekly_scores[player][-1] += points
+                log_points(player, points, f"{season_winner} won the season but you ranked them second to last", final_week_index)
+            elif picks[player][-3] == season_winner:
+                points = -25
+                weekly_scores[player][-1] += points
+                log_points(player, points, f"{season_winner} won the season but you ranked them third to last", final_week_index)
+
+            runner_up = evictions[-2]
+            if picks[player][0] == runner_up:
+                points = 75
+                weekly_scores[player][-1] += points
+                log_points(player, points, f"{runner_up} finished runner-up and you ranked them first", final_week_index)
+            elif picks[player][1] == runner_up:
+                points = 50
+                weekly_scores[player][-1] += points
+                log_points(player, points, f"{runner_up} finished runner-up and you ranked them second", final_week_index)
+            elif picks[player][2] == runner_up:
+                points = 25
+                weekly_scores[player][-1] += points
+                log_points(player, points, f"{runner_up} finished runner-up and you ranked them third", final_week_index)
+            elif picks[player][-1] == runner_up:
+                points = -50
+                weekly_scores[player][-1] += points
+                log_points(player, points, f"{runner_up} finished runner-up but you ranked them last", final_week_index)
+            elif picks[player][-2] == runner_up:
+                points = -25
+                weekly_scores[player][-1] += points
+                log_points(player, points, f"{runner_up} finished runner-up but you ranked them second to last", final_week_index)
+            elif picks[player][-3] == runner_up:
+                points = -10
+                weekly_scores[player][-1] += points
+                log_points(player, points, f"{runner_up} finished runner-up but you ranked them third to last", final_week_index)
+
+            third_place = evictions[-3]
+            if picks[player][0] == third_place:
+                points = 50
+                weekly_scores[player][-1] += points
+                log_points(player, points, f"{third_place} finished third and you ranked them first", final_week_index)
+            elif picks[player][1] == third_place:
+                points = 25
+                weekly_scores[player][-1] += points
+                log_points(player, points, f"{third_place} finished third and you ranked them second", final_week_index)
+            elif picks[player][2] == third_place:
+                points = 10
+                weekly_scores[player][-1] += points
+                log_points(player, points, f"{third_place} finished third and you ranked them third", final_week_index)
+            elif picks[player][-1] == third_place:
+                points = -25
+                weekly_scores[player][-1] += points
+                log_points(player, points, f"{third_place} finished third but you ranked them last", final_week_index)
+            elif picks[player][-2] == third_place:
+                points = -10
+                weekly_scores[player][-1] += points
+                log_points(player, points, f"{third_place} finished third but you ranked them second to last", final_week_index)
+            elif picks[player][-3] == third_place:
+                points = -5
+                weekly_scores[player][-1] += points
+                log_points(player, points, f"{third_place} finished third but you ranked them third to last", final_week_index)
+
+
     for player in weekly_scores:
         total_scores[player] = sum(weekly_scores[player])
 
