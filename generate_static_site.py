@@ -1,6 +1,7 @@
 import os
 import csv
 import shutil
+import re
 from jinja2 import Environment, FileSystemLoader
 import matplotlib.pyplot as plt
 import numpy as np
@@ -89,6 +90,21 @@ def read_points_from_csv(filename):
     except Exception as e:
         print(f"Error reading {filename}: {e}")
     return headers, points
+
+
+def points_rows_to_scores(points_data):
+    weekly_scores = {}
+    total_scores = {}
+    for row in points_data:
+        if len(row) < 3:
+            continue
+        player = row[0]
+        try:
+            total_scores[player] = float(row[1])
+            weekly_scores[player] = [float(value) for value in row[2:]]
+        except ValueError:
+            continue
+    return weekly_scores, total_scores
 
 
 def calc_points(hoh_winners, veto_winners, off_block, other_comp_winners, evictions, americas_favorite, buy_back, picks):
@@ -299,6 +315,284 @@ def read_raw_data_from_csv(filename):
     return data
 
 
+def format_points(value):
+    if float(value).is_integer():
+        return str(int(value))
+    return f'{value:.2f}'.rstrip('0').rstrip('.')
+
+
+def build_player_chart_data(weekly_scores, total_scores):
+    sorted_players = sorted(total_scores.items(), key=lambda x: x[1], reverse=True)
+    leaders_total = sorted_players[0][1] if sorted_players else 0
+    players = []
+    for rank, (player, total) in enumerate(sorted_players, start=1):
+        weekly = [float(score) for score in weekly_scores[player]]
+        cumulative = np.cumsum(weekly).tolist()
+        players.append({
+            'rank': rank,
+            'name': player,
+            'total': float(total),
+            'totalLabel': format_points(float(total)),
+            'weekly': weekly,
+            'cumulative': [float(score) for score in cumulative],
+            'lastWeek': weekly[-1] if weekly else 0,
+            'bestWeek': max(weekly) if weekly else 0,
+            'gap': float(leaders_total - total),
+        })
+    return players
+
+
+def build_summary(player_chart_data):
+    if not player_chart_data:
+        return {
+            'leader': 'TBD',
+            'leaderPoints': '0',
+            'playerCount': 0,
+            'weeksScored': 0,
+            'averageScore': '0',
+            'highestWeekPlayer': 'TBD',
+            'highestWeekPoints': '0',
+        }
+
+    total_points = [player['total'] for player in player_chart_data]
+    highest_week_player = max(player_chart_data, key=lambda player: player['bestWeek'])
+    return {
+        'leader': player_chart_data[0]['name'],
+        'leaderPoints': player_chart_data[0]['totalLabel'],
+        'playerCount': len(player_chart_data),
+        'weeksScored': len(player_chart_data[0]['weekly']),
+        'averageScore': format_points(float(np.mean(total_points))),
+        'highestWeekPlayer': highest_week_player['name'],
+        'highestWeekPoints': format_points(float(highest_week_player['bestWeek'])),
+    }
+
+
+def points_by_rank(contestant_count, formula):
+    return [float(formula(rank, contestant_count)) for rank in range(contestant_count)]
+
+
+def final_bonus_points(rank, contestant_count, positive, negative):
+    if rank < len(positive):
+        return positive[rank]
+    reverse_index = contestant_count - 1 - rank
+    if reverse_index < len(negative):
+        return negative[reverse_index]
+    return 0
+
+
+def build_contestant_events(hoh_winners, veto_winners, off_block, other_comp_winners,
+                            evictions, buy_back, americas_favorite, contestant_count,
+                            week_count):
+    events = []
+
+    def add_event(contestant, week, reason, rank_points):
+        if not contestant or week < 0 or week >= week_count:
+            return
+        events.append({
+            'contestant': contestant,
+            'week': week,
+            'reason': reason,
+            'pointsByRank': rank_points,
+        })
+
+    for week, winner in enumerate(hoh_winners):
+        add_event(winner, week, 'HOH win', points_by_rank(contestant_count, lambda rank, _count: 10 - rank))
+
+    for week, winner in enumerate(veto_winners):
+        add_event(winner, week, 'Veto win', points_by_rank(contestant_count, lambda rank, _count: 10 - rank))
+
+    for week, contestants in off_block.items():
+        for contestant in contestants:
+            add_event(contestant, week, 'Got off the block', points_by_rank(contestant_count, lambda rank, _count: 7.5 - (rank * 0.75)))
+
+    for week, contestants in other_comp_winners.items():
+        for contestant in contestants:
+            add_event(contestant, week, 'Other competition win', points_by_rank(contestant_count, lambda rank, _count: 5 - (rank * 0.5)))
+
+    for week, contestants in buy_back.items():
+        for contestant in contestants:
+            add_event(contestant, week, 'Buy back', points_by_rank(contestant_count, lambda rank, _count: 10 - rank))
+
+    season_complete = len(evictions) >= contestant_count
+    final_week = min(max(len(hoh_winners), 0), max(week_count - 1, 0))
+    if season_complete and week_count:
+        if americas_favorite:
+            add_event(
+                americas_favorite,
+                final_week,
+                "America's Favorite",
+                points_by_rank(contestant_count, lambda rank, count: final_bonus_points(rank, count, [75, 50, 25], [-50, -25, -10])),
+            )
+
+        placements = [
+            (evictions[-1] if len(evictions) >= 1 else '', 'Season winner', [100, 75, 50], [-75, -50, -25]),
+            (evictions[-2] if len(evictions) >= 2 else '', 'Runner-up', [75, 50, 25], [-50, -25, -10]),
+            (evictions[-3] if len(evictions) >= 3 else '', 'Third place', [50, 25, 10], [-25, -10, -5]),
+        ]
+        for contestant, reason, positive, negative in placements:
+            add_event(
+                contestant,
+                final_week,
+                reason,
+                points_by_rank(contestant_count, lambda rank, count, p=positive, n=negative: final_bonus_points(rank, count, p, n)),
+            )
+
+    return events
+
+
+def build_contestant_breakdown(picks, hoh_winners, veto_winners, off_block,
+                               other_comp_winners, evictions, buy_back,
+                               americas_favorite, week_count):
+    contestants = sorted({contestant for player_picks in picks.values() for contestant in player_picks if contestant})
+    contestant_count = max([len(player_picks) for player_picks in picks.values()], default=len(contestants))
+    if not contestants or not week_count:
+        return []
+
+    events = build_contestant_events(
+        hoh_winners,
+        veto_winners,
+        off_block,
+        other_comp_winners,
+        evictions,
+        buy_back,
+        americas_favorite,
+        contestant_count,
+        week_count,
+    )
+    events_by_contestant = {}
+    for event in events:
+        events_by_contestant.setdefault(event['contestant'], []).append(event)
+
+    rank_by_player = {
+        player: {contestant: rank for rank, contestant in enumerate(player_picks)}
+        for player, player_picks in picks.items()
+    }
+
+    breakdown = []
+    for contestant in contestants:
+        actual_weekly = [0.0] * week_count
+        weekly_by_rank = [[0.0] * week_count for _ in range(contestant_count)]
+        event_summaries = []
+        for event in events_by_contestant.get(contestant, []):
+            week = event['week']
+            for rank, value in enumerate(event['pointsByRank']):
+                weekly_by_rank[rank][week] += value
+            for player_rankings in rank_by_player.values():
+                rank = player_rankings.get(contestant)
+                if rank is not None and rank < len(event['pointsByRank']):
+                    actual_weekly[week] += event['pointsByRank'][rank]
+            event_summaries.append({
+                'week': week,
+                'reason': event['reason'],
+                'firstRankPoints': event['pointsByRank'][0] if event['pointsByRank'] else 0,
+            })
+
+        actual_cumulative = np.cumsum(actual_weekly).tolist()
+        breakdown.append({
+            'name': contestant,
+            'actualWeekly': [float(value) for value in actual_weekly],
+            'actualCumulative': [float(value) for value in actual_cumulative],
+            'actualTotal': float(sum(actual_weekly)),
+            'weeklyByRank': weekly_by_rank,
+            'events': event_summaries,
+        })
+
+    return sorted(breakdown, key=lambda item: item['actualTotal'], reverse=True)
+
+
+def build_blank_season():
+    return {
+        'id': 'current',
+        'label': 'Big Brother 28',
+        'status': 'No current-season scoring data has been added yet.',
+        'isArchive': False,
+        'isEmpty': True,
+        'playerChartData': [],
+        'weekLabels': [],
+        'summary': build_summary([]),
+        'picksHeaders': ['name'],
+        'picksData': [],
+        'pointsHeaders': ['Player', 'Total Points'],
+        'pointsData': [],
+        'winnersHeaders': ['Category'],
+        'winnersData': [],
+        'logs': {},
+        'playerNames': [],
+        'contestants': [],
+    }
+
+
+def build_season(season_id, label, picks_file, winners_file, points_file, log_file=None, status='Archived season'):
+    picks_headers, picks = read_picks_from_csv(picks_file)
+    points_headers, points_data = read_points_from_csv(points_file)
+    weekly_scores, total_scores = points_rows_to_scores(points_data)
+    winners_raw = read_raw_data_from_csv(winners_file)
+    hoh, veto, off_block, other_comp, evictions, buy_back, fav = read_winners_from_csv(winners_file)
+
+    week_count = len(next(iter(weekly_scores.values()), [])) if weekly_scores else 0
+    week_labels = [f'Week {i+1}' for i in range(week_count)]
+    winners_headers = ['Category'] + [f'Week {i+1}' for i in range(max((len(row) for row in winners_raw), default=1) - 1)]
+    winners_data = [[row[0]] + row[1:] for row in winners_raw]
+    logs = read_logs_from_csv(log_file) if log_file and os.path.exists(log_file) else {}
+    player_chart_data = build_player_chart_data(weekly_scores, total_scores)
+
+    return {
+        'id': season_id,
+        'label': label,
+        'status': status,
+        'isArchive': True,
+        'isEmpty': not bool(player_chart_data),
+        'playerChartData': player_chart_data,
+        'weekLabels': week_labels,
+        'summary': build_summary(player_chart_data),
+        'picksHeaders': picks_headers,
+        'picksData': read_raw_data_from_csv(picks_file)[1:],
+        'pointsHeaders': points_headers,
+        'pointsData': points_data,
+        'winnersHeaders': winners_headers,
+        'winnersData': winners_data,
+        'logs': logs,
+        'playerNames': list(logs.keys()),
+        'contestants': build_contestant_breakdown(picks, hoh, veto, off_block, other_comp, evictions, buy_back, fav, week_count),
+    }
+
+
+def discover_archive_seasons():
+    seasons = [
+        build_season(
+            'previous',
+            'Big Brother 27',
+            os.path.join(DATA_DIR, 'picks.csv'),
+            os.path.join(DATA_DIR, 'winners.csv'),
+            os.path.join(DATA_DIR, 'points.csv'),
+            os.path.join(DATA_DIR, 'log.csv'),
+            'Most recent completed draft season',
+        )
+    ]
+
+    archive_dir = os.path.join(DATA_DIR, 'archived_data')
+    if os.path.isdir(archive_dir):
+        for filename in sorted(os.listdir(archive_dir)):
+            match = re.match(r'points_(.+)\.csv$', filename)
+            if not match:
+                continue
+            suffix = match.group(1)
+            picks_file = os.path.join(archive_dir, f'picks_{suffix}.csv')
+            winners_file = os.path.join(archive_dir, f'winners_{suffix}.csv')
+            points_file = os.path.join(archive_dir, filename)
+            if os.path.exists(picks_file) and os.path.exists(winners_file):
+                seasons.append(build_season(
+                    f'archive-{suffix}',
+                    f'Big Brother {suffix}',
+                    picks_file,
+                    winners_file,
+                    points_file,
+                    None,
+                    f'Archived season {suffix}',
+                ))
+    return seasons
+
+
 def find_file(*names):
     for name in names:
         path = os.path.join(DATA_DIR, name)
@@ -308,47 +602,46 @@ def find_file(*names):
 
 
 def main():
-    picks_file = find_file('picks.csv')
-    winners_file = find_file('winners.csv')
-    points_file = find_file('points.csv')
-    log_file = find_file('log.csv')
+    current_season = build_blank_season()
+    archive_seasons = discover_archive_seasons()
+    seasons = [current_season] + archive_seasons
 
-    picks_headers, picks = read_picks_from_csv(picks_file)
-    hoh, veto, off_block, other_comp, evictions, buy_back, fav = read_winners_from_csv(winners_file)
-    weekly_scores, total_scores = calc_points(hoh, veto, off_block, other_comp, evictions, fav, buy_back, picks)
-
-    plot_total_scores(total_scores)
-    plot_scores_over_time(weekly_scores)
-
-    shutil.copy(os.path.join(IMAGE_SRC, 'total_scores.png'), os.path.join(IMAGE_DST, 'total_scores.png'))
-    shutil.copy(os.path.join(IMAGE_SRC, 'cumulative_scores.png'), os.path.join(IMAGE_DST, 'cumulative_scores.png'))
-
-    picks_data = read_raw_data_from_csv(picks_file)
-    points_headers, points_data = read_points_from_csv(points_file)
-    winners_raw = read_raw_data_from_csv(winners_file)
-
-    num_weeks = len(winners_raw[0]) - 1
-    winners_headers = ['Category'] + [f'Week {i+1}' for i in range(num_weeks)]
-    winners_data = [[row[0]] + row[1:] for row in winners_raw]
-
-    logs = read_logs_from_csv(log_file)
-    player_names = list(logs.keys())
-    leaderboard = sorted(total_scores.items(), key=lambda x: x[1], reverse=True)
+    if archive_seasons:
+        latest_archive = archive_seasons[0]
+        latest_weekly_scores = {
+            player['name']: player['weekly']
+            for player in latest_archive['playerChartData']
+        }
+        latest_total_scores = {
+            player['name']: player['total']
+            for player in latest_archive['playerChartData']
+        }
+        if latest_weekly_scores and latest_total_scores:
+            plot_total_scores(latest_total_scores)
+            plot_scores_over_time(latest_weekly_scores)
+            shutil.copy(os.path.join(IMAGE_SRC, 'total_scores.png'), os.path.join(IMAGE_DST, 'total_scores.png'))
+            shutil.copy(os.path.join(IMAGE_SRC, 'cumulative_scores.png'), os.path.join(IMAGE_DST, 'cumulative_scores.png'))
 
     env = Environment(loader=FileSystemLoader(os.path.join(BASE_DIR, 'templates')))
     template = env.get_template('index.html')
     html = template.render(
         total_scores_img='static/images/total_scores.png',
         cumulative_scores_img='static/images/cumulative_scores.png',
-        picks_headers=picks_headers,
-        picks_data=picks_data,
-        points_headers=points_headers,
-        points_data=points_data,
-        winners_headers=winners_headers,
-        winners_data=winners_data,
-        leaderboard=leaderboard,
-        logs=logs,
-        player_names=player_names
+        picks_headers=current_season['picksHeaders'],
+        picks_data=current_season['picksData'],
+        points_headers=current_season['pointsHeaders'],
+        points_data=current_season['pointsData'],
+        winners_headers=current_season['winnersHeaders'],
+        winners_data=current_season['winnersData'],
+        leaderboard=[],
+        logs=current_season['logs'],
+        player_names=current_season['playerNames'],
+        player_chart_data=current_season['playerChartData'],
+        week_labels=current_season['weekLabels'],
+        summary=current_season['summary'],
+        seasons=seasons,
+        archive_seasons=archive_seasons,
+        active_season_id=current_season['id'],
     )
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
