@@ -551,7 +551,7 @@
 
         .insight-cards {
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 12px;
             margin-top: 14px;
         }
@@ -1968,6 +1968,12 @@
             const weeklyWinner = [...selected].sort((a, b) => weeklyAt(b, state.focusWeek) - weeklyAt(a, state.focusWeek))[0];
             const volatile = [...selected].sort((a, b) => b.volatility - a.volatility)[0];
             const momentum = [...selected].sort((a, b) => b.momentum3 - a.momentum3)[0];
+            const steady = [...selected].sort((a, b) => a.volatility - b.volatility)[0];
+            const floor = [...selected].sort((a, b) => {
+                const worstA = Math.min(...(a.weekly || [0]));
+                const worstB = Math.min(...(b.weekly || [0]));
+                return worstB - worstA;
+            })[0];
             const rankMover = [...selected].sort((a, b) => {
                 const prevA = a.rankSeries[Math.max(0, state.focusWeek - 1)] || a.rankSeries[state.focusWeek];
                 const prevB = b.rankSeries[Math.max(0, state.focusWeek - 1)] || b.rankSeries[state.focusWeek];
@@ -1979,7 +1985,9 @@
                 <article class="insight-card"><span>${activeWeekLabel()} leader</span><strong>${escapeHtml(leader.name)}</strong><p>${formatPoint(cumulativeAt(leader, state.focusWeek))} cumulative points, ranked ${ordinal(leader.rankSeries[state.focusWeek])} overall.</p></article>
                 <article class="insight-card"><span>Weekly hit</span><strong>${escapeHtml(weeklyWinner.name)}</strong><p>${signed(weeklyAt(weeklyWinner, state.focusWeek))} points in ${activeWeekLabel()}.</p></article>
                 <article class="insight-card"><span>Rank pressure</span><strong>${escapeHtml(rankMover.name)}</strong><p>${rankDelta === 0 ? "Held position" : `${rankDelta > 0 ? "Climbed" : "Dropped"} ${Math.abs(rankDelta)} spot${Math.abs(rankDelta) === 1 ? "" : "s"}`} into ${ordinal(rankMover.rankSeries[state.focusWeek])}.</p></article>
-                <article class="insight-card"><span>Chaos meter</span><strong>${escapeHtml(volatile.name)}</strong><p>${formatPoint(volatile.volatility)} point weekly volatility. Momentum leader: ${escapeHtml(momentum.name)} (${signed(momentum.momentum3)} last 3).</p></article>
+                <article class="insight-card"><span>Chaos meter</span><strong>${escapeHtml(volatile.name)}</strong><p>${formatPoint(volatile.volatility)} point weekly volatility, with ${volatile.positiveWeeks} positive and ${volatile.negativeWeeks} negative weeks.</p></article>
+                <article class="insight-card"><span>Hot hand</span><strong>${escapeHtml(momentum.name)}</strong><p>${signed(momentum.momentum3)} points over the last 3 scored weeks.</p></article>
+                <article class="insight-card"><span>Safest floor</span><strong>${escapeHtml(floor.name)}</strong><p>Worst weekly result: ${signed(Math.min(...(floor.weekly || [0])))}. Steadiest entry: ${escapeHtml(steady.name)} (${formatPoint(steady.volatility)} volatility).</p></article>
             `;
         }
 
@@ -2076,13 +2084,11 @@
             const key = state.mode === "cumulative" ? "cumulative" : "weekly";
             const leader = [...selected].sort((a, b) => Number(b[key]?.[weekIndex] || 0) - Number(a[key]?.[weekIndex] || 0))[0];
             const weeklyWinner = [...selected].sort((a, b) => weeklyAt(b, weekIndex) - weeklyAt(a, weekIndex))[0];
-            const overallLeader = [...players].sort((a, b) => cumulativeAt(b, weekIndex) - cumulativeAt(a, weekIndex))[0];
             return {
                 title: activeWeekLabelFor(weekIndex),
                 rows: [
                     `${state.mode === "cumulative" ? "Selected leader" : "Selected weekly high"}: ${leader.name} (${formatPoint(Number(leader[key]?.[weekIndex] || 0))} pts)`,
-                    `Best selected weekly score: ${weeklyWinner.name} ${signed(weeklyAt(weeklyWinner, weekIndex))}`,
-                    `Overall leader then: ${overallLeader.name} (${formatPoint(cumulativeAt(overallLeader, weekIndex))} pts)`,
+                    `Selected highest weekly differential: ${weeklyWinner.name} ${signed(weeklyAt(weeklyWinner, weekIndex))}`,
                 ],
             };
         }
