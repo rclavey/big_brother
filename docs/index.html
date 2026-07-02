@@ -480,6 +480,19 @@
             padding: 0 12px;
         }
 
+        .field.disabled .label,
+        .field.disabled .info-button {
+            color: #9aa7a3;
+        }
+
+        .field.disabled select,
+        .field select:disabled {
+            border-color: #dde5e2;
+            background: #f2f5f4;
+            color: #9aa7a3;
+            cursor: not-allowed;
+        }
+
         .field input:focus,
         .field select:focus {
             border-color: var(--teal);
@@ -1389,7 +1402,7 @@
                                 <span class="label-row"><span class="label">Week</span><button class="info-button" type="button" data-help="contestantWeek" aria-label="Explain contestant week">i</button></span>
                                 <select id="contestantWeekSelect"></select>
                             </label>
-                            <label class="field">
+                            <label class="field" id="contestantRankField">
                                 <span class="label-row"><span class="label">Ranking position</span><button class="info-button" type="button" data-help="rankingPosition" aria-label="Explain ranking position">i</button></span>
                                 <select id="contestantRankSelect"></select>
                             </label>
@@ -1593,6 +1606,7 @@
             contestantMode: document.querySelector("#contestantMode"),
             contestantTimeMode: document.querySelector("#contestantTimeMode"),
             contestantWeekSelect: document.querySelector("#contestantWeekSelect"),
+            contestantRankField: document.querySelector("#contestantRankField"),
             contestantRankSelect: document.querySelector("#contestantRankSelect"),
             contestantOutput: document.querySelector("#contestantOutput"),
             contestantEvents: document.querySelector("#contestantEvents"),
@@ -1682,7 +1696,7 @@
             contestantMode: {
                 title: "Mode",
                 body: "Actual Draft Impact means what the contestant actually did to all submitted player entries based on where everyone ranked that contestant.",
-                bullets: ["Example: if three players ranked a contestant differently, Actual Draft Impact aggregates the real point effect across those entries.", "Hypothetical Rank answers a what-if question: how many points would this contestant have produced if a single player ranked them at the selected ranking position?", "So yes: Actual Draft Impact is the contestant's real effect on the draft entries, while Hypothetical Rank isolates one ranking slot."]
+                bullets: ["Example: if three players ranked a contestant differently, Actual Draft Impact aggregates the real point effect across those entries.", "Hypothetical Rank answers a what-if question: how many points would this contestant have produced if a single player ranked them at the selected ranking position?"]
             },
             contestantTime: {
                 title: "Time view",
@@ -1937,6 +1951,13 @@
             els.compareB.value = players[1]?.name || players[0]?.name || "";
         }
 
+        function updateContestantRankControlState() {
+            const rankActive = els.contestantMode.value === "simulated";
+            els.contestantRankSelect.disabled = !rankActive;
+            els.contestantRankField.classList.toggle("disabled", !rankActive);
+            els.contestantRankSelect.setAttribute("aria-disabled", (!rankActive).toString());
+        }
+
         function populateContestantControls() {
             const contestantOptions = contestants.map((contestant) => `<option value="${escapeHtml(contestant.name)}">${escapeHtml(contestant.name)}</option>`).join("");
             els.contestantSelect.innerHTML = contestantOptions || '<option value="">No contestants</option>';
@@ -1952,6 +1973,7 @@
                 ? Array.from({ length: rankCount }, (_, index) => `<option value="${index}">#${index + 1}</option>`).join("")
                 : '<option value="0">No rankings</option>';
             els.contestantRankSelect.value = "0";
+            updateContestantRankControlState();
         }
 
         function renderSummary() {
@@ -2352,6 +2374,7 @@
         }
 
         function renderContestants() {
+            updateContestantRankControlState();
             drawContestantChart();
             renderContestantDetails();
         }
