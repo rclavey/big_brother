@@ -259,6 +259,96 @@
             background: #fbfdfc;
         }
 
+        .label-row,
+        .title-row {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .title-row {
+            flex-wrap: wrap;
+        }
+
+        .info-button {
+            display: inline-grid;
+            width: 20px;
+            height: 20px;
+            min-height: 20px;
+            padding: 0;
+            place-items: center;
+            border: 1px solid #cbd7d3;
+            border-radius: 50%;
+            background: #ffffff;
+            color: var(--muted);
+            font-size: 0.72rem;
+            font-weight: 900;
+            line-height: 1;
+            transition: border-color 140ms ease, background 140ms ease, color 140ms ease;
+        }
+
+        .info-button:hover,
+        .info-button:focus-visible {
+            border-color: var(--teal);
+            background: #eef8f6;
+            color: var(--teal-dark);
+        }
+
+        .help-popover {
+            position: fixed;
+            right: clamp(16px, 3vw, 32px);
+            bottom: clamp(16px, 3vw, 32px);
+            z-index: 30;
+            width: min(430px, calc(100vw - 32px));
+            padding: 18px;
+            border: 1px solid #cbd7d3;
+            border-radius: var(--radius);
+            background: #ffffff;
+            box-shadow: 0 24px 70px rgba(20, 32, 30, 0.2);
+        }
+
+        .help-popover[hidden] {
+            display: none;
+        }
+
+        .help-popover h3 {
+            margin: 5px 0 8px;
+            font-size: 1.08rem;
+            line-height: 1.2;
+            letter-spacing: 0;
+        }
+
+        .help-popover p {
+            margin: 0;
+            color: #43504d;
+            line-height: 1.55;
+        }
+
+        .help-popover ul {
+            margin: 12px 0 0;
+            padding-left: 18px;
+            color: #43504d;
+            line-height: 1.5;
+        }
+
+        .help-popover li + li {
+            margin-top: 6px;
+        }
+
+        .help-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            min-height: 30px;
+            padding: 0 9px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: #f7faf9;
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 850;
+        }
+
         .icon {
             width: 18px;
             height: 18px;
@@ -1123,29 +1213,31 @@
 
             <section class="control-bar" aria-label="Chart controls">
                 <label class="field">
-                    <span class="label">Season</span>
+                    <span class="label-row"><span class="label">Season</span><button class="info-button" type="button" data-help="season" aria-label="Explain Season">i</button></span>
                     <select id="seasonSelect" aria-label="Season"></select>
                 </label>
                 <div class="control-group">
-                    <span class="label">Chart mode</span>
+                    <span class="label-row"><span class="label">Chart mode</span><button class="info-button" type="button" data-help="chartMode" aria-label="Explain Chart mode">i</button></span>
                     <div class="segmented" role="group" aria-label="Chart mode">
                         <button class="segment active" type="button" data-mode="cumulative">Cumulative</button>
                         <button class="segment" type="button" data-mode="weekly">Weekly</button>
                     </div>
                 </div>
                 <label class="field">
-                    <span class="label">Find player</span>
+                    <span class="label-row"><span class="label">Find player</span><button class="info-button" type="button" data-help="playerSearch" aria-label="Explain Find player">i</button></span>
                     <input id="playerSearch" type="search" placeholder="Search standings" autocomplete="off">
                 </label>
                 <label class="toggle">
                     <input id="averageToggle" type="checkbox" checked>
                     Show average
+                    <button class="info-button" type="button" data-help="average" aria-label="Explain Show average">i</button>
                 </label>
                 <div class="button-row" role="group" aria-label="Selection presets">
                     <button class="ghost-button" type="button" data-preset="all">All</button>
                     <button class="ghost-button" type="button" data-preset="top5">Top 5</button>
                     <button class="ghost-button" type="button" data-preset="chasers">Chasers</button>
                     <button class="ghost-button" type="button" data-preset="clear">Clear</button>
+                    <button class="info-button" type="button" data-help="presets" aria-label="Explain selection presets">i</button>
                 </div>
             </section>
 
@@ -1154,7 +1246,7 @@
                     <div class="panel-heading">
                         <div>
                             <p class="eyebrow">Score movement</p>
-                            <h2 id="trendTitle">Cumulative score trend</h2>
+                            <h2 class="title-row"><span id="trendTitle">Cumulative score trend</span><button class="info-button" type="button" data-help="scoreMovement" aria-label="Explain score movement chart">i</button></h2>
                         </div>
                     </div>
                     <div class="chart-frame">
@@ -1167,7 +1259,7 @@
                     <div class="panel-heading">
                         <div>
                             <p class="eyebrow">Race snapshot</p>
-                            <h2>Current totals</h2>
+                            <h2 class="title-row">Current totals<button class="info-button" type="button" data-help="currentTotals" aria-label="Explain current totals chart">i</button></h2>
                         </div>
                     </div>
                     <div class="chart-frame small">
@@ -1180,7 +1272,7 @@
                 <div class="section-heading">
                     <div>
                         <p class="eyebrow">Graph options</p>
-                        <h2 id="pickerTitle">Select the people to highlight.</h2>
+                        <h2 class="title-row"><span id="pickerTitle">Select the people to highlight.</span><button class="info-button" type="button" data-help="graphOptions" aria-label="Explain graph options">i</button></h2>
                     </div>
                     <span class="label" id="selectionCount">0 selected</span>
                 </div>
@@ -1192,10 +1284,10 @@
                 <div class="section-heading">
                     <div>
                         <p class="eyebrow">Insights lab</p>
-                        <h2 id="insightsTitle">Momentum, rank pressure, and weekly leverage.</h2>
+                        <h2 class="title-row"><span id="insightsTitle">Momentum, rank pressure, and weekly leverage.</span><button class="info-button" type="button" data-help="insightCards" aria-label="Explain Insights lab">i</button></h2>
                     </div>
                     <label class="field">
-                        <span class="label">Focus week</span>
+                        <span class="label-row"><span class="label">Focus week</span><button class="info-button" type="button" data-help="focusWeek" aria-label="Explain Focus week">i</button></span>
                         <select id="focusWeekSelect" aria-label="Focus week"></select>
                     </label>
                 </div>
@@ -1207,7 +1299,7 @@
                         <div class="panel-heading">
                             <div>
                                 <p class="eyebrow">Rank race</p>
-                                <h2>Position over time</h2>
+                                <h2 class="title-row">Position over time<button class="info-button" type="button" data-help="rankRace" aria-label="Explain rank race">i</button></h2>
                             </div>
                         </div>
                         <div class="chart-frame medium">
@@ -1219,7 +1311,7 @@
                         <div class="panel-heading">
                             <div>
                                 <p class="eyebrow">Week impact</p>
-                                <h2 id="impactTitle">Selected players this week</h2>
+                                <h2 class="title-row"><span id="impactTitle">Selected players this week</span><button class="info-button" type="button" data-help="weekImpact" aria-label="Explain week impact">i</button></h2>
                             </div>
                         </div>
                         <div class="chart-frame medium">
@@ -1231,7 +1323,7 @@
                         <div class="panel-heading">
                             <div>
                                 <p class="eyebrow">Score heatmap</p>
-                                <h2>Where points were won and lost</h2>
+                                <h2 class="title-row">Where points were won and lost<button class="info-button" type="button" data-help="heatmap" aria-label="Explain score heatmap">i</button></h2>
                             </div>
                         </div>
                         <div class="chart-frame medium">
@@ -1243,16 +1335,16 @@
                         <div class="panel-heading">
                             <div>
                                 <p class="eyebrow">Head-to-head</p>
-                                <h2>Compare two entries</h2>
+                                <h2 class="title-row">Compare two entries<button class="info-button" type="button" data-help="headToHead" aria-label="Explain head-to-head">i</button></h2>
                             </div>
                         </div>
                         <div class="comparison-controls">
                             <label class="field">
-                                <span class="label">Entry A</span>
+                                <span class="label-row"><span class="label">Entry A</span><button class="info-button" type="button" data-help="entryCompare" aria-label="Explain Entry A">i</button></span>
                                 <select id="compareA"></select>
                             </label>
                             <label class="field">
-                                <span class="label">Entry B</span>
+                                <span class="label-row"><span class="label">Entry B</span><button class="info-button" type="button" data-help="entryCompare" aria-label="Explain Entry B">i</button></span>
                                 <select id="compareB"></select>
                             </label>
                         </div>
@@ -1266,7 +1358,7 @@
                 <div class="section-heading">
                     <div>
                         <p class="eyebrow">Contestant breakdown</p>
-                        <h2 id="contestantsTitle">See who is creating or destroying value.</h2>
+                        <h2 class="title-row"><span id="contestantsTitle">See who is creating or destroying value.</span><button class="info-button" type="button" data-help="contestantBreakdown" aria-label="Explain contestant breakdown">i</button></h2>
                     </div>
                     <span class="season-badge" id="contestantSeasonBadge">Big Brother 28</span>
                 </div>
@@ -1275,30 +1367,30 @@
                         <div class="panel-heading">
                             <div>
                                 <p class="eyebrow">Contribution map</p>
-                                <h2 id="contestantChartTitle">Contestant value</h2>
+                                <h2 class="title-row"><span id="contestantChartTitle">Contestant value</span><button class="info-button" type="button" data-help="contributionMap" aria-label="Explain contribution map">i</button></h2>
                             </div>
                         </div>
                         <div class="comparison-controls">
                             <label class="field">
-                                <span class="label">Mode</span>
+                                <span class="label-row"><span class="label">Mode</span><button class="info-button" type="button" data-help="contestantMode" aria-label="Explain contestant mode">i</button></span>
                                 <select id="contestantMode">
                                     <option value="actual">Actual draft impact</option>
                                     <option value="simulated">Hypothetical rank</option>
                                 </select>
                             </label>
                             <label class="field">
-                                <span class="label">Time view</span>
+                                <span class="label-row"><span class="label">Time view</span><button class="info-button" type="button" data-help="contestantTime" aria-label="Explain time view">i</button></span>
                                 <select id="contestantTimeMode">
                                     <option value="cumulative">Cumulative through week</option>
                                     <option value="weekly">Single week</option>
                                 </select>
                             </label>
                             <label class="field">
-                                <span class="label">Week</span>
+                                <span class="label-row"><span class="label">Week</span><button class="info-button" type="button" data-help="contestantWeek" aria-label="Explain contestant week">i</button></span>
                                 <select id="contestantWeekSelect"></select>
                             </label>
                             <label class="field">
-                                <span class="label">Ranking position</span>
+                                <span class="label-row"><span class="label">Ranking position</span><button class="info-button" type="button" data-help="rankingPosition" aria-label="Explain ranking position">i</button></span>
                                 <select id="contestantRankSelect"></select>
                             </label>
                         </div>
@@ -1311,11 +1403,11 @@
                         <div class="panel-heading">
                             <div>
                                 <p class="eyebrow">Contestant lens</p>
-                                <h2>Selected contestant</h2>
+                                <h2 class="title-row">Selected contestant<button class="info-button" type="button" data-help="selectedContestant" aria-label="Explain selected contestant">i</button></h2>
                             </div>
                         </div>
                         <label class="field">
-                            <span class="label">Contestant</span>
+                            <span class="label-row"><span class="label">Contestant</span><button class="info-button" type="button" data-help="contestantSelect" aria-label="Explain contestant selector">i</button></span>
                             <select id="contestantSelect"></select>
                         </label>
                         <div class="comparison-output" id="contestantOutput"></div>
@@ -1328,7 +1420,7 @@
                 <div class="section-heading">
                     <div>
                         <p class="eyebrow">Standings</p>
-                        <h2 id="leaderboardTitle">Leaderboard</h2>
+                        <h2 class="title-row"><span id="leaderboardTitle">Leaderboard</span><button class="info-button" type="button" data-help="leaderboard" aria-label="Explain leaderboard">i</button></h2>
                     </div>
                 </div>
                 <div class="table-wrap">
@@ -1367,7 +1459,7 @@
                 <div class="section-heading">
                     <div>
                         <p class="eyebrow">Audit trail</p>
-                        <h2 id="dataTitle">Picks, points, and winners</h2>
+                        <h2 class="title-row"><span id="dataTitle">Picks, points, and winners</span><button class="info-button" type="button" data-help="sourceData" aria-label="Explain source data">i</button></h2>
                     </div>
                 </div>
                 <div class="tabs" role="tablist" aria-label="Data tables">
@@ -1375,10 +1467,11 @@
                     <button class="tab-button" type="button" data-tab="pointsPanel">Points</button>
                     <button class="tab-button" type="button" data-tab="winnersPanel">Winners</button>
                     <button class="tab-button" type="button" data-tab="staticGraphsPanel">Static exports</button>
+                    <button class="info-button" type="button" data-help="dataTabs" aria-label="Explain data tabs">i</button>
                 </div>
                 <div class="table-tools">
                     <label class="field">
-                        <span class="label">Search table</span>
+                        <span class="label-row"><span class="label">Search table</span><button class="info-button" type="button" data-help="tableSearch" aria-label="Explain table search">i</button></span>
                         <input id="tableSearch" type="search" placeholder="Filter visible rows" autocomplete="off">
                     </label>
                 </div>
@@ -1422,12 +1515,12 @@
                 <div class="section-heading">
                     <div>
                         <p class="eyebrow">Point history</p>
-                        <h2 id="logsTitle">Scoring logs</h2>
+                        <h2 class="title-row"><span id="logsTitle">Scoring logs</span><button class="info-button" type="button" data-help="scoringLogs" aria-label="Explain scoring logs">i</button></h2>
                     </div>
                 </div>
                 <div class="log-controls">
                     <label class="field">
-                        <span class="label">Player</span>
+                        <span class="label-row"><span class="label">Player</span><button class="info-button" type="button" data-help="logPlayer" aria-label="Explain log player filter">i</button></span>
                         <select id="logPlayerFilter">
                             <option value="all">All players</option>
                             {% for player in player_names %}
@@ -1436,7 +1529,7 @@
                         </select>
                     </label>
                     <label class="field">
-                        <span class="label">Search logs</span>
+                        <span class="label-row"><span class="label">Search logs</span><button class="info-button" type="button" data-help="logSearch" aria-label="Explain log search">i</button></span>
                         <input id="logSearch" type="search" placeholder="Filter by person, week, or reason" autocomplete="off">
                     </label>
                 </div>
@@ -1453,10 +1546,10 @@
                 <div class="section-heading">
                     <div>
                         <p class="eyebrow">Archive</p>
-                        <h2 id="archiveTitle">Previous seasons with the full analytics suite.</h2>
+                        <h2 class="title-row"><span id="archiveTitle">Previous seasons with the full analytics suite.</span><button class="info-button" type="button" data-help="archive" aria-label="Explain archive">i</button></h2>
                     </div>
                     <label class="field">
-                        <span class="label">Load archive</span>
+                        <span class="label-row"><span class="label">Load archive</span><button class="info-button" type="button" data-help="archiveSeason" aria-label="Explain archive season">i</button></span>
                         <select id="archiveSeasonSelect" aria-label="Archive season"></select>
                     </label>
                 </div>
@@ -1470,6 +1563,14 @@
                 </div>
             </section>
         </main>
+
+        <aside class="help-popover" id="helpPopover" role="dialog" aria-labelledby="helpTitle" aria-describedby="helpBody" hidden>
+            <button class="help-close" type="button" id="helpClose">Close</button>
+            <p class="eyebrow" id="helpKicker">Guide</p>
+            <h3 id="helpTitle">Dashboard help</h3>
+            <p id="helpBody"></p>
+            <ul id="helpList"></ul>
+        </aside>
     </div>
 
     <script id="seasonData" type="application/json">{{ seasons | tojson }}</script>
@@ -1514,6 +1615,151 @@
             contestantRankSelect: document.querySelector("#contestantRankSelect"),
             contestantOutput: document.querySelector("#contestantOutput"),
             contestantEvents: document.querySelector("#contestantEvents"),
+            helpPopover: document.querySelector("#helpPopover"),
+            helpTitle: document.querySelector("#helpTitle"),
+            helpBody: document.querySelector("#helpBody"),
+            helpList: document.querySelector("#helpList"),
+            helpClose: document.querySelector("#helpClose"),
+        };
+
+        const helpContent = {
+            season: {
+                title: "Season",
+                body: "Loads a full season into every dashboard section. Big Brother 28 is the blank current season, while archived seasons keep their historical data available for analysis.",
+                bullets: ["Changing this updates charts, insights, tables, logs, and contestant breakdowns together.", "Archived seasons remain interactive, not just static snapshots."]
+            },
+            chartMode: {
+                title: "Chart mode",
+                body: "Controls the main score movement graph.",
+                bullets: ["Cumulative shows each entry's running total through each week.", "Weekly shows only the points won or lost in that individual week."]
+            },
+            playerSearch: {
+                title: "Find player",
+                body: "Filters the player picker and leaderboard-style rows so you can quickly isolate one entry without changing the underlying season data."
+            },
+            average: {
+                title: "Show average",
+                body: "Adds or removes the average entry line from the main score movement chart. This is useful as a baseline for judging whether a highlighted player is beating the pack."
+            },
+            presets: {
+                title: "Selection presets",
+                body: "Fast shortcuts for deciding who appears in the selected-player charts.",
+                bullets: ["All selects everyone.", "Top 5 selects the current top entries.", "Chasers selects the entries just behind the leader.", "Clear removes every player from the highlighted chart set."]
+            },
+            scoreMovement: {
+                title: "Score movement",
+                body: "This is the main trend chart for selected players. Hovering the chart shows the exact week, selected leader, and the selected highest weekly differential at that point."
+            },
+            currentTotals: {
+                title: "Current totals",
+                body: "Shows the current total score for each entry in the loaded season. In an archived season, this means the final archived total unless you use focus-week tools elsewhere."
+            },
+            graphOptions: {
+                title: "Graph options",
+                body: "Select which players should be emphasized across the interactive charts. These selections drive the trend chart, rank race, week impact chart, heatmap, and Insights Lab."
+            },
+            focusWeek: {
+                title: "Focus week",
+                body: "Sets the week used by the Insights Lab and focus-week charts. The default is the highest available week in the selected season.",
+                bullets: ["Insight cards only look up to this week.", "Week impact uses this specific week.", "Head-to-head comparisons use results through this week."]
+            },
+            insightCards: {
+                title: "Insights Lab",
+                body: "A set of superlatives for the currently selected players at the focus week.",
+                bullets: ["Leader and weekly hit use the exact focus week.", "Chaos, hot hand, and safest floor only use data through the focus week.", "Rank pressure compares the focus week with the prior week."]
+            },
+            rankRace: {
+                title: "Rank race",
+                body: "Shows each selected player's rank over time. Lower is better, so the top of the chart is first place."
+            },
+            weekImpact: {
+                title: "Week impact",
+                body: "Ranks selected players by how many points they won or lost in the focus week. Positive bars helped that week; negative bars hurt that week."
+            },
+            heatmap: {
+                title: "Score heatmap",
+                body: "Shows weekly scoring intensity for selected players across the season. Darker green means stronger positive scoring; darker red means a larger negative week."
+            },
+            headToHead: {
+                title: "Head-to-head",
+                body: "Compares two entries through the selected focus week.",
+                bullets: ["The first card shows the cumulative gap through the focus week.", "The swing card shows the single-week margin at the focus week.", "The week-wins list only includes weeks up to the focus week."]
+            },
+            entryCompare: {
+                title: "Entry comparison selectors",
+                body: "Choose the two draft entries to compare in the head-to-head panel. These are player entries, not Big Brother contestants."
+            },
+            contestantBreakdown: {
+                title: "Contestant breakdown",
+                body: "Explains which Big Brother contestants are creating or destroying fantasy value for draft entries."
+            },
+            contributionMap: {
+                title: "Contribution map",
+                body: "Ranks Big Brother contestants by their scoring value under the selected mode, time view, week, and ranking position.",
+                bullets: ["Use it to find which contestants generated the most positive value or caused the biggest damage.", "The chart changes when you switch between actual draft impact and hypothetical rank."]
+            },
+            contestantMode: {
+                title: "Mode",
+                body: "Actual Draft Impact means what the contestant actually did to all submitted player entries based on where everyone ranked that contestant.",
+                bullets: ["Example: if three players ranked a contestant differently, Actual Draft Impact aggregates the real point effect across those entries.", "Hypothetical Rank answers a what-if question: how many points would this contestant have produced if a single player ranked them at the selected ranking position?", "So yes: Actual Draft Impact is the contestant's real effect on the draft entries, while Hypothetical Rank isolates one ranking slot."]
+            },
+            contestantTime: {
+                title: "Time view",
+                body: "Controls whether contestant value is shown for one week or as a running total.",
+                bullets: ["Single week shows only the chosen week.", "Cumulative through week sums every week up to and including the chosen week."]
+            },
+            contestantWeek: {
+                title: "Week",
+                body: "Sets the week used by the contribution map and selected-contestant cards. The default is the highest week with data in the selected season."
+            },
+            rankingPosition: {
+                title: "Ranking position",
+                body: "Used by Hypothetical Rank mode. It lets you ask: if this contestant were ranked #1, #2, #3, and so on, how many points would they have produced?"
+            },
+            selectedContestant: {
+                title: "Selected contestant",
+                body: "Focuses the detail cards and scoring-event log on one Big Brother contestant, so you can inspect how their value was created."
+            },
+            contestantSelect: {
+                title: "Contestant selector",
+                body: "Chooses the Big Brother contestant shown in the detail panel. This does not change the contribution map ranking; it changes the breakdown on the right."
+            },
+            leaderboard: {
+                title: "Leaderboard",
+                body: "Shows the loaded season standings, current totals, last-week score, and gap to first place."
+            },
+            sourceData: {
+                title: "Source data",
+                body: "The table section exposes the underlying picks, point events, winners, and static graph exports that feed the dashboard."
+            },
+            dataTabs: {
+                title: "Data tabs",
+                body: "Switches between the raw picks table, scoring events table, winners table, and the static chart exports."
+            },
+            tableSearch: {
+                title: "Search table",
+                body: "Filters the currently visible data table. It does not remove or recalculate any data; it only hides rows that do not match the search."
+            },
+            scoringLogs: {
+                title: "Scoring logs",
+                body: "A readable audit trail of why points were awarded or removed. Use it to trace a chart movement back to the underlying event."
+            },
+            logPlayer: {
+                title: "Player filter",
+                body: "Limits the scoring log to one draft entry or shows all entries."
+            },
+            logSearch: {
+                title: "Search logs",
+                body: "Filters scoring logs by player, week, Big Brother contestant, event, or scoring reason."
+            },
+            archive: {
+                title: "Archive",
+                body: "Stores prior seasons with the same analytics available in the current-season dashboard."
+            },
+            archiveSeason: {
+                title: "Load archive",
+                body: "Loads an archived season into the entire dashboard, including charts, Insights Lab, leaderboard, logs, and contestant breakdown."
+            }
         };
 
         function escapeHtml(value) {
@@ -1524,6 +1770,25 @@
                 '"': "&quot;",
                 "'": "&#39;",
             }[char]));
+        }
+
+        function openHelp(key) {
+            const content = helpContent[key];
+            if (!content) return;
+            els.helpTitle.textContent = content.title;
+            els.helpBody.textContent = content.body;
+            if (content.bullets?.length) {
+                els.helpList.hidden = false;
+                els.helpList.innerHTML = content.bullets.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+            } else {
+                els.helpList.hidden = true;
+                els.helpList.innerHTML = "";
+            }
+            els.helpPopover.hidden = false;
+        }
+
+        function closeHelp() {
+            els.helpPopover.hidden = true;
         }
 
         function colorFor(index) {
@@ -2286,6 +2551,22 @@
         document.querySelector("#tableSearch").addEventListener("input", filterTableRows);
         document.querySelector("#logPlayerFilter").addEventListener("change", filterLogs);
         document.querySelector("#logSearch").addEventListener("input", filterLogs);
+        document.querySelectorAll("[data-help]").forEach((button) => {
+            button.addEventListener("click", (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                openHelp(button.dataset.help);
+            });
+        });
+        els.helpClose.addEventListener("click", closeHelp);
+        document.addEventListener("click", (event) => {
+            if (els.helpPopover.hidden) return;
+            if (els.helpPopover.contains(event.target) || event.target.closest("[data-help]")) return;
+            closeHelp();
+        });
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") closeHelp();
+        });
         window.addEventListener("resize", updateCharts);
         setActiveSeason(activeSeason.id);
     </script>
