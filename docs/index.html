@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Big Brother Fantasy Draft</title>
     <meta name="description" content="Fantasy Big Brother standings, picks, scoring logs, and interactive score charts.">
+    <link rel="icon" href="data:,">
     <style>
         :root {
             --bg: #f5f2ec;
@@ -977,6 +978,36 @@
             gap: 12px;
         }
 
+        .scenario-stack {
+            display: grid;
+            gap: 10px;
+        }
+
+        .scenario-row {
+            display: grid;
+            grid-template-columns: minmax(140px, 1fr) minmax(140px, 1fr) minmax(74px, 92px) 42px;
+            gap: 10px;
+            align-items: end;
+            padding: 12px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: #fbfdfc;
+        }
+
+        .scenario-row .field {
+            min-width: 0;
+        }
+
+        .scenario-row input[type="number"] {
+            width: 100%;
+        }
+
+        .scenario-remove {
+            align-self: end;
+            width: 42px;
+            height: 42px;
+        }
+
         .what-if-blurb {
             padding: 16px;
             border: 1px solid #cbd7d3;
@@ -1074,6 +1105,10 @@
                 grid-template-columns: 1fr;
             }
 
+            .scenario-row {
+                grid-template-columns: 1fr;
+            }
+
             .player-picker,
             .insight-cards {
                 grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1157,10 +1192,10 @@
                 <a href="#charts"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"></path><path d="m6 16 4-5 4 3 5-8"></path></svg>Charts</a>
                 <a href="#insights"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18"></path><path d="M5 8h14"></path><path d="M7 16h10"></path><path d="m8 12 4-4 4 4"></path></svg>Insights</a>
                 <a href="#contestants"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z"></path><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Contestants</a>
-                <a href="#whatif"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M12 2a7 7 0 0 0-4 12c.8.7 1.2 1.5 1.2 2.3h5.6c0-.8.4-1.6 1.2-2.3A7 7 0 0 0 12 2Z"></path></svg>What-If</a>
                 <a href="#leaderboard"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8"></path><path d="M12 17v4"></path><path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"></path><path d="M5 5H3v3a4 4 0 0 0 4 4"></path><path d="M19 5h2v3a4 4 0 0 1-4 4"></path></svg>Leaderboard</a>
                 <a href="#data"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16"></path><path d="M4 12h16"></path><path d="M4 19h16"></path><path d="M8 5v14"></path><path d="M16 5v14"></path></svg>Data</a>
                 <a href="#logs"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h9a3 3 0 0 0 3-3V5a2 2 0 0 0-2-2H7a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3Z"></path><path d="M8 7h8"></path><path d="M8 11h8"></path><path d="M8 15h5"></path></svg>Logs</a>
+                <a href="#whatif"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M12 2a7 7 0 0 0-4 12c.8.7 1.2 1.5 1.2 2.3h5.6c0-.8.4-1.6 1.2-2.3A7 7 0 0 0 12 2Z"></path></svg>What-If</a>
                 <a href="#archive"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"></path><path d="M6 7v13h12V7"></path><path d="M9 11h6"></path><path d="M8 3h8l2 4H6l2-4Z"></path></svg>Archive</a>
             </nav>
             <div class="side-panel">
@@ -1475,78 +1510,6 @@
                 </div>
             </section>
 
-            <section class="section" id="whatif" aria-labelledby="whatIfTitle">
-                <div class="section-heading">
-                    <div>
-                        <p class="eyebrow">What-If report</p>
-                        <h2 class="title-row"><span id="whatIfTitle">Stress-test one result before it happens.</span><button class="info-button" type="button" data-help="whatIfReport" aria-label="Explain What-If report">i</button></h2>
-                    </div>
-                    <span class="season-badge" id="whatIfSeasonBadge">Big Brother 28</span>
-                </div>
-                <div class="what-if-grid">
-                    <article class="panel">
-                        <div class="panel-heading">
-                            <div>
-                                <p class="eyebrow">Scenario builder</p>
-                                <h2>Choose the result</h2>
-                            </div>
-                        </div>
-                        <div class="what-if-controls">
-                            <label class="field">
-                                <span class="label-row"><span class="label">Result type</span><button class="info-button" type="button" data-help="whatIfEvent" aria-label="Explain result type">i</button></span>
-                                <select id="whatIfEventSelect">
-                                    <option value="hoh">Head of Household</option>
-                                    <option value="veto">Veto</option>
-                                    <option value="offBlock">Gets off the block</option>
-                                    <option value="other">Other competition</option>
-                                    <option value="buyBack">Buy back</option>
-                                    <option value="americaFavorite">America's Favorite</option>
-                                    <option value="winner">Season winner</option>
-                                    <option value="runnerUp">Runner-up</option>
-                                    <option value="thirdPlace">Third place</option>
-                                </select>
-                            </label>
-                            <label class="field">
-                                <span class="label-row"><span class="label">Houseguest</span><button class="info-button" type="button" data-help="whatIfContestant" aria-label="Explain What-If houseguest">i</button></span>
-                                <select id="whatIfContestantSelect"></select>
-                            </label>
-                            <label class="field">
-                                <span class="label-row"><span class="label">Focus entry</span><button class="info-button" type="button" data-help="whatIfFocus" aria-label="Explain What-If focus entry">i</button></span>
-                                <select id="whatIfFocusSelect"></select>
-                            </label>
-                        </div>
-                    </article>
-
-                    <article class="panel">
-                        <div class="panel-heading">
-                            <div>
-                                <p class="eyebrow">Projected fallout</p>
-                                <h2>Leaderboard after the scenario</h2>
-                            </div>
-                        </div>
-                        <div class="what-if-results">
-                            <div class="comparison-output" id="whatIfCards"></div>
-                            <div class="what-if-blurb" id="whatIfBlurb"></div>
-                            <div class="table-wrap">
-                                <table class="leaderboard-table projection-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Projected</th>
-                                            <th>Entry</th>
-                                            <th>Houseguest rank</th>
-                                            <th>Change</th>
-                                            <th>Projected total</th>
-                                            <th>Rank move</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="whatIfLeaderboardBody"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </article>
-                </div>
-            </section>
-
             <section class="section" id="leaderboard" aria-labelledby="leaderboardTitle">
                 <div class="section-heading">
                     <div>
@@ -1654,6 +1617,65 @@
                 </ul>
             </section>
 
+            <section class="section" id="whatif" aria-labelledby="whatIfTitle">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">What-If report</p>
+                        <h2 class="title-row"><span id="whatIfTitle">Stack hypothetical results before they happen.</span><button class="info-button" type="button" data-help="whatIfReport" aria-label="Explain What-If report">i</button></h2>
+                    </div>
+                    <span class="season-badge" id="whatIfSeasonBadge">Big Brother 28</span>
+                </div>
+                <div class="what-if-grid">
+                    <article class="panel">
+                        <div class="panel-heading">
+                            <div>
+                                <p class="eyebrow">Scenario builder</p>
+                                <h2>Choose the results</h2>
+                            </div>
+                        </div>
+                        <div class="what-if-controls">
+                            <div class="scenario-stack" id="whatIfScenarioList" aria-label="What-If scenario rows"></div>
+                            <div class="button-row" role="group" aria-label="What-If scenario actions">
+                                <button class="ghost-button" type="button" id="whatIfAddScenario">Add result</button>
+                                <button class="ghost-button" type="button" id="whatIfResetScenarios">Reset</button>
+                            </div>
+                            <label class="field">
+                                <span class="label-row"><span class="label">Focus entry</span><button class="info-button" type="button" data-help="whatIfFocus" aria-label="Explain What-If focus entry">i</button></span>
+                                <select id="whatIfFocusSelect"></select>
+                            </label>
+                        </div>
+                    </article>
+
+                    <article class="panel">
+                        <div class="panel-heading">
+                            <div>
+                                <p class="eyebrow">Projected fallout</p>
+                                <h2>Leaderboard after the scenario stack</h2>
+                            </div>
+                        </div>
+                        <div class="what-if-results">
+                            <div class="comparison-output" id="whatIfCards"></div>
+                            <div class="what-if-blurb" id="whatIfBlurb"></div>
+                            <div class="table-wrap">
+                                <table class="leaderboard-table projection-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Projected</th>
+                                            <th>Entry</th>
+                                            <th>Scenario ranks</th>
+                                            <th>Change</th>
+                                            <th>Projected total</th>
+                                            <th>Rank move</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="whatIfLeaderboardBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
             <section class="section" id="archive" aria-labelledby="archiveTitle">
                 <div class="section-heading">
                     <div>
@@ -1695,6 +1717,7 @@
         let weekLabels = [];
         let contestants = [];
         let trendGeometry = null;
+        let whatIfPlanId = 0;
 
         const state = {
             mode: "cumulative",
@@ -1703,6 +1726,7 @@
             showAverage: true,
             focusWeek: 0,
             hoverWeek: null,
+            whatIfPlan: [],
         };
 
         const els = {
@@ -1729,8 +1753,9 @@
             contestantOutput: document.querySelector("#contestantOutput"),
             contestantEvents: document.querySelector("#contestantEvents"),
             whatIfSeasonBadge: document.querySelector("#whatIfSeasonBadge"),
-            whatIfEventSelect: document.querySelector("#whatIfEventSelect"),
-            whatIfContestantSelect: document.querySelector("#whatIfContestantSelect"),
+            whatIfScenarioList: document.querySelector("#whatIfScenarioList"),
+            whatIfAddScenario: document.querySelector("#whatIfAddScenario"),
+            whatIfResetScenarios: document.querySelector("#whatIfResetScenarios"),
             whatIfFocusSelect: document.querySelector("#whatIfFocusSelect"),
             whatIfCards: document.querySelector("#whatIfCards"),
             whatIfBlurb: document.querySelector("#whatIfBlurb"),
@@ -1846,8 +1871,8 @@
             },
             whatIfReport: {
                 title: "What-If report",
-                body: "Projects how one hypothetical result would change every entry's score and the full leaderboard.",
-                bullets: ["Pick a result type and houseguest to apply the scoring formula.", "Choose a focus entry to highlight how that one player would be affected.", "The projected leaderboard only adds this one scenario on top of the loaded season's current totals."]
+                body: "Projects how one or more hypothetical results would change every entry's score and the full leaderboard.",
+                bullets: ["Each row applies one scoring formula to one houseguest.", "Use Times for repeated results, such as the same houseguest winning three Vetos.", "Choose a focus entry to highlight how that one player would be affected.", "The projected leaderboard adds only the scenario stack on top of the loaded season's current totals."]
             },
             whatIfEvent: {
                 title: "Result type",
@@ -2178,13 +2203,74 @@
             return [...names].sort((a, b) => a.localeCompare(b));
         }
 
+        function createWhatIfPlanItem(overrides = {}) {
+            return {
+                id: ++whatIfPlanId,
+                event: overrides.event || "hoh",
+                contestant: overrides.contestant || contestantNamesFromPicks()[0] || "",
+                count: Number(overrides.count || 1),
+            };
+        }
+
+        function resetWhatIfPlan() {
+            state.whatIfPlan = [createWhatIfPlanItem()];
+        }
+
+        function whatIfEventOptions(selected) {
+            return Object.entries(whatIfScenarios)
+                .map(([value, scenario]) => `<option value="${escapeHtml(value)}" ${value === selected ? "selected" : ""}>${escapeHtml(scenario.label)}</option>`)
+                .join("");
+        }
+
+        function whatIfContestantOptions(selected) {
+            const names = contestantNamesFromPicks();
+            return names.length
+                ? names.map((name) => `<option value="${escapeHtml(name)}" ${name === selected ? "selected" : ""}>${escapeHtml(name)}</option>`).join("")
+                : '<option value="">No houseguests</option>';
+        }
+
+        function normalizeWhatIfPlanItem(item) {
+            const names = contestantNamesFromPicks();
+            const contestant = names.includes(item.contestant) ? item.contestant : (names[0] || "");
+            const event = whatIfScenarios[item.event] ? item.event : "hoh";
+            const count = clamp(Math.round(Number(item.count || 1)), 1, 20);
+            return { ...item, event, contestant, count };
+        }
+
+        function renderWhatIfPlanControls() {
+            state.whatIfPlan = (state.whatIfPlan.length ? state.whatIfPlan : [createWhatIfPlanItem()]).map(normalizeWhatIfPlanItem);
+            els.whatIfScenarioList.innerHTML = state.whatIfPlan.map((item, index) => `
+                <div class="scenario-row" data-what-if-id="${item.id}">
+                    <label class="field">
+                        <span class="label">Result ${index + 1}</span>
+                        <select class="what-if-event" aria-label="Result type ${index + 1}">
+                            ${whatIfEventOptions(item.event)}
+                        </select>
+                    </label>
+                    <label class="field">
+                        <span class="label">Houseguest</span>
+                        <select class="what-if-contestant" aria-label="Houseguest ${index + 1}">
+                            ${whatIfContestantOptions(item.contestant)}
+                        </select>
+                    </label>
+                    <label class="field">
+                        <span class="label">Times</span>
+                        <input class="what-if-count" type="number" min="1" max="20" step="1" value="${item.count}" aria-label="Times for result ${index + 1}">
+                    </label>
+                    <button class="icon-button scenario-remove" type="button" data-action="remove-what-if" data-id="${item.id}" aria-label="Remove result ${index + 1}" title="Remove result">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+                    </button>
+                </div>
+            `).join("");
+        }
+
         function populateWhatIfControls() {
             els.whatIfSeasonBadge.textContent = activeSeason.label;
-            const contestantOptions = contestantNamesFromPicks().map((name) => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join("");
-            els.whatIfContestantSelect.innerHTML = contestantOptions || '<option value="">No houseguests</option>';
             const focusOptions = players.map((player) => `<option value="${escapeHtml(player.name)}">${escapeHtml(player.name)}</option>`).join("");
             els.whatIfFocusSelect.innerHTML = focusOptions || '<option value="">No entries</option>';
             els.whatIfFocusSelect.value = players[0]?.name || "";
+            resetWhatIfPlan();
+            renderWhatIfPlanControls();
         }
 
         function renderSummary() {
@@ -2602,22 +2688,58 @@
             return "";
         }
 
-        function calculateWhatIfRows() {
-            const scenario = whatIfScenarios[els.whatIfEventSelect.value] || whatIfScenarios.hoh;
-            const contestant = els.whatIfContestantSelect.value;
+        function joinPhraseList(items) {
+            if (items.length <= 1) return items[0] || "";
+            if (items.length === 2) return `${items[0]} and ${items[1]}`;
+            return `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`;
+        }
+
+        function activeWhatIfEntries() {
+            state.whatIfPlan = (state.whatIfPlan.length ? state.whatIfPlan : [createWhatIfPlanItem()]).map(normalizeWhatIfPlanItem);
+            return state.whatIfPlan
+                .map((item) => ({
+                    ...item,
+                    scenario: whatIfScenarios[item.event] || whatIfScenarios.hoh,
+                }))
+                .filter((item) => item.contestant && item.count > 0);
+        }
+
+        function whatIfScenarioPhrase(entry) {
+            const repeatText = entry.count > 1 ? ` ${entry.count} times` : "";
+            return `${entry.contestant} ${entry.scenario.phrase}${repeatText}`;
+        }
+
+        function whatIfDetailSummary(details) {
+            return details.length
+                ? details.map((detail) => `${detail.contestant}: ${detail.pickRank ? `#${detail.pickRank}` : "Unranked"}${detail.count > 1 ? ` x${detail.count}` : ""}`).join("; ")
+                : "No matching picks";
+        }
+
+        function calculateWhatIfRows(entries) {
             const picksByPlayer = new Map((activeSeason.picksData || []).map((row) => [row[0], row.slice(1)]));
             const rows = players.map((player, index) => {
                 const picks = picksByPlayer.get(player.name) || [];
-                const rank = picks.findIndex((pick) => pick === contestant);
                 const contestantCount = picks.length || contestantNamesFromPicks().length || 1;
-                const delta = rank >= 0 ? scenario.score(rank, contestantCount) : 0;
+                const details = entries.map((entry) => {
+                    const rank = picks.findIndex((pick) => pick === entry.contestant);
+                    const singleDelta = rank >= 0 ? entry.scenario.score(rank, contestantCount) : 0;
+                    return {
+                        contestant: entry.contestant,
+                        event: entry.scenario.label,
+                        count: entry.count,
+                        pickRank: rank >= 0 ? rank + 1 : null,
+                        delta: singleDelta * entry.count,
+                    };
+                });
+                const delta = sum(details.map((detail) => detail.delta));
                 return {
                     name: player.name,
                     currentRank: Number(player.rank || index + 1),
                     currentTotal: Number(player.total || 0),
                     delta,
                     projectedTotal: Number(player.total || 0) + delta,
-                    pickRank: rank >= 0 ? rank + 1 : null,
+                    details,
+                    pickSummary: whatIfDetailSummary(details),
                 };
             });
 
@@ -2631,55 +2753,72 @@
         }
 
         function renderWhatIf() {
-            const scenario = whatIfScenarios[els.whatIfEventSelect.value] || whatIfScenarios.hoh;
-            const contestant = els.whatIfContestantSelect.value;
+            renderWhatIfPlanControls();
+            const entries = activeWhatIfEntries();
             const focusName = els.whatIfFocusSelect.value || players[0]?.name || "";
-            if (!players.length || !(activeSeason.picksData || []).length || !contestant) {
+            if (!players.length || !(activeSeason.picksData || []).length || !entries.length) {
                 els.whatIfCards.innerHTML = '<article class="comparison-card"><span>No scenario</span><strong>Load archive data</strong><p>The What-If report needs draft picks and current standings.</p></article>';
                 els.whatIfBlurb.textContent = "Load an archived season to test how a hypothetical competition result would reshape the leaderboard.";
                 els.whatIfLeaderboardBody.innerHTML = '<tr><td colspan="6">No projection available.</td></tr>';
                 return;
             }
 
-            const rows = calculateWhatIfRows();
+            const rows = calculateWhatIfRows(entries);
             const focus = rows.find((row) => row.name === focusName) || rows[0];
             const projectedLeader = rows[0];
             const currentLeader = players[0];
             const biggestGain = [...rows].sort((a, b) => b.delta - a.delta)[0];
             const biggestLoss = [...rows].sort((a, b) => a.delta - b.delta)[0];
             const rankChanges = rows.filter((row) => row.rankMove !== 0).length;
+            const scenarioPhrase = joinPhraseList(entries.map(whatIfScenarioPhrase));
+            const resultCount = sum(entries.map((entry) => entry.count));
             const leaderPhrase = currentLeader?.name === projectedLeader.name
-                ? `${escapeHtml(projectedLeader.name)} would stay in first`
-                : `the lead would flip from ${escapeHtml(currentLeader?.name || "the current leader")} to ${escapeHtml(projectedLeader.name)}`;
+                ? `${projectedLeader.name} would stay in first`
+                : `the lead would flip from ${currentLeader?.name || "the current leader"} to ${projectedLeader.name}`;
             const focusDeltaPhrase = focus.delta === 0
                 ? "would not gain or lose points"
                 : `would ${focus.delta > 0 ? "gain" : "lose"} ${formatPoint(Math.abs(focus.delta))} points`;
             const focusRankPhrase = focus.rankMove === 0
                 ? `hold ${ordinal(focus.projectedRank)} place`
                 : `${focus.rankMove > 0 ? "climb" : "drop"} ${Math.abs(focus.rankMove)} spot${Math.abs(focus.rankMove) === 1 ? "" : "s"} to ${ordinal(focus.projectedRank)} place`;
-            const focusPickPhrase = focus.pickRank
-                ? `they ranked ${contestant} #${focus.pickRank}`
-                : `${contestant} was not on their draft list`;
+            const focusPickPhrase = `their scenario ranks are ${whatIfDetailSummary(focus.details).replace(/; /g, ", ")}`;
 
             els.whatIfCards.innerHTML = `
                 <article class="comparison-card"><span>Focus impact</span><strong>${escapeHtml(focus.name)}</strong><p>${signed(focus.delta)} points because ${escapeHtml(focusPickPhrase)}.</p></article>
-                <article class="comparison-card"><span>Projected leader</span><strong>${escapeHtml(projectedLeader.name)}</strong><p>${formatPoint(projectedLeader.projectedTotal)} projected points after this scenario.</p></article>
+                <article class="comparison-card"><span>Projected leader</span><strong>${escapeHtml(projectedLeader.name)}</strong><p>${formatPoint(projectedLeader.projectedTotal)} projected points after this stack.</p></article>
                 <article class="comparison-card"><span>Biggest swing</span><strong>${escapeHtml(biggestGain.name)}</strong><p>Best gain: ${signed(biggestGain.delta)}. Worst hit: ${escapeHtml(biggestLoss.name)} at ${signed(biggestLoss.delta)}.</p></article>
-                <article class="comparison-card"><span>Rank movement</span><strong>${rankChanges}</strong><p>${rankChanges === 1 ? "entry changes" : "entries change"} projected rank.</p></article>
+                <article class="comparison-card"><span>Scenario stack</span><strong>${resultCount}</strong><p>${resultCount === 1 ? "hypothetical result" : "hypothetical results"} across ${entries.length} ${entries.length === 1 ? "row" : "rows"}; ${rankChanges} ${rankChanges === 1 ? "entry changes" : "entries change"} projected rank.</p></article>
             `;
 
-            els.whatIfBlurb.textContent = `What-If report: If ${contestant} ${scenario.phrase}, ${focus.name} ${focusDeltaPhrase} because ${focusPickPhrase}, and would ${focusRankPhrase}. On the full leaderboard, ${leaderPhrase}; ${biggestGain.name} benefits most (${signed(biggestGain.delta)}), while ${biggestLoss.name} is hurt most (${signed(biggestLoss.delta)}).`;
+            els.whatIfBlurb.textContent = `What-If report: If ${scenarioPhrase}, ${focus.name} ${focusDeltaPhrase} because ${focusPickPhrase}, and would ${focusRankPhrase}. On the full leaderboard, ${leaderPhrase}; ${biggestGain.name} benefits most (${signed(biggestGain.delta)}), while ${biggestLoss.name} is hurt most (${signed(biggestLoss.delta)}).`;
 
             els.whatIfLeaderboardBody.innerHTML = rows.map((row) => `
                 <tr class="${row.name === focus.name ? "focus-row" : ""}">
                     <td class="rank-cell">#${row.projectedRank}</td>
                     <td><strong>${escapeHtml(row.name)}</strong></td>
-                    <td>${row.pickRank ? `#${row.pickRank}` : "Unranked"}</td>
+                    <td>${escapeHtml(row.pickSummary)}</td>
                     <td>${signed(row.delta)}</td>
                     <td>${formatPoint(row.projectedTotal)}</td>
                     <td class="${rankMoveClass(row.rankMove)}">${rankMoveLabel(row.rankMove)}</td>
                 </tr>
             `).join("");
+        }
+
+        function updateWhatIfPlanFromControl(target) {
+            const row = target.closest(".scenario-row");
+            if (!row) return;
+            const item = state.whatIfPlan.find((candidate) => candidate.id === Number(row.dataset.whatIfId));
+            if (!item) return;
+            if (target.classList.contains("what-if-event")) item.event = target.value;
+            if (target.classList.contains("what-if-contestant")) item.contestant = target.value;
+            if (target.classList.contains("what-if-count")) item.count = target.value;
+            renderWhatIf();
+        }
+
+        function removeWhatIfPlanItem(id) {
+            state.whatIfPlan = state.whatIfPlan.filter((item) => item.id !== id);
+            if (!state.whatIfPlan.length) resetWhatIfPlan();
+            renderWhatIf();
         }
 
         function setFocusWeek(index, options = {}) {
@@ -2837,7 +2976,20 @@
         els.seasonSelect.addEventListener("change", (event) => setActiveSeason(event.target.value));
         els.archiveSeasonSelect.addEventListener("change", (event) => event.target.value && setActiveSeason(event.target.value));
         [els.contestantSelect, els.contestantMode, els.contestantTimeMode, els.contestantWeekSelect, els.contestantRankSelect].forEach((control) => control.addEventListener("change", renderContestants));
-        [els.whatIfEventSelect, els.whatIfContestantSelect, els.whatIfFocusSelect].forEach((control) => control.addEventListener("change", renderWhatIf));
+        els.whatIfScenarioList.addEventListener("change", (event) => updateWhatIfPlanFromControl(event.target));
+        els.whatIfScenarioList.addEventListener("click", (event) => {
+            const removeButton = event.target.closest("[data-action='remove-what-if']");
+            if (removeButton) removeWhatIfPlanItem(Number(removeButton.dataset.id));
+        });
+        els.whatIfAddScenario.addEventListener("click", () => {
+            state.whatIfPlan.push(createWhatIfPlanItem({ event: "veto" }));
+            renderWhatIf();
+        });
+        els.whatIfResetScenarios.addEventListener("click", () => {
+            resetWhatIfPlan();
+            renderWhatIf();
+        });
+        els.whatIfFocusSelect.addEventListener("change", renderWhatIf);
         els.trendChart.addEventListener("pointermove", handleTrendPointerMove);
         els.trendChart.addEventListener("pointerleave", handleTrendPointerLeave);
         document.querySelector("#resetView").addEventListener("click", () => {
