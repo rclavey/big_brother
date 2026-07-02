@@ -960,6 +960,46 @@
             line-height: 1.62;
         }
 
+        .scoring-breakdown strong {
+            color: var(--ink);
+        }
+
+        .what-if-grid {
+            display: grid;
+            grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.15fr);
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .what-if-controls,
+        .what-if-results {
+            display: grid;
+            gap: 12px;
+        }
+
+        .what-if-blurb {
+            padding: 16px;
+            border: 1px solid #cbd7d3;
+            border-radius: var(--radius);
+            background: #f7fbfa;
+            color: #30413d;
+            line-height: 1.55;
+        }
+
+        .projection-table tr.focus-row {
+            background: #fff8e6;
+        }
+
+        .projection-table .rank-up {
+            color: var(--teal-dark);
+            font-weight: 900;
+        }
+
+        .projection-table .rank-down {
+            color: var(--red);
+            font-weight: 900;
+        }
+
         details {
             border: 1px solid var(--line);
             border-radius: var(--radius);
@@ -1016,7 +1056,7 @@
             }
 
             .side-nav {
-                grid-template-columns: repeat(8, minmax(0, 1fr));
+                grid-template-columns: repeat(9, minmax(0, 1fr));
                 margin-top: 18px;
             }
 
@@ -1029,7 +1069,8 @@
             .contestant-grid,
             .chart-grid,
             .insight-grid,
-            .rules-grid {
+            .rules-grid,
+            .what-if-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -1116,6 +1157,7 @@
                 <a href="#charts"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"></path><path d="m6 16 4-5 4 3 5-8"></path></svg>Charts</a>
                 <a href="#insights"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18"></path><path d="M5 8h14"></path><path d="M7 16h10"></path><path d="m8 12 4-4 4 4"></path></svg>Insights</a>
                 <a href="#contestants"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z"></path><path d="M4 21a8 8 0 0 1 16 0"></path></svg>Contestants</a>
+                <a href="#whatif"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M12 2a7 7 0 0 0-4 12c.8.7 1.2 1.5 1.2 2.3h5.6c0-.8.4-1.6 1.2-2.3A7 7 0 0 0 12 2Z"></path></svg>What-If</a>
                 <a href="#leaderboard"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8"></path><path d="M12 17v4"></path><path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"></path><path d="M5 5H3v3a4 4 0 0 0 4 4"></path><path d="M19 5h2v3a4 4 0 0 1-4 4"></path></svg>Leaderboard</a>
                 <a href="#data"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16"></path><path d="M4 12h16"></path><path d="M4 19h16"></path><path d="M8 5v14"></path><path d="M16 5v14"></path></svg>Data</a>
                 <a href="#logs"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h9a3 3 0 0 0 3-3V5a2 2 0 0 0-2-2H7a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3Z"></path><path d="M8 7h8"></path><path d="M8 11h8"></path><path d="M8 15h5"></path></svg>Logs</a>
@@ -1201,14 +1243,17 @@
                     <div>
                         <details open>
                             <summary>Point scoring</summary>
-                            <ol>
+                            <ol class="scoring-breakdown">
                                 <li>Head of Household: 10 minus the contestant ranking.</li>
                                 <li>Veto: 10 minus the contestant ranking.</li>
                                 <li>Getting off the block: 7.5 minus 0.75 times ranking.</li>
                                 <li>Other competitions: 5 minus 0.5 times ranking.</li>
                                 <li>Buy back: 10 minus ranking when an evicted houseguest returns.</li>
                                 <li>Perfect eviction order: 100 bonus points.</li>
-                                <li>America's Favorite, winner, runner-up, and third-place bonuses or penalties depend on where they appeared in each list.</li>
+                                <li><strong>America's Favorite:</strong> +75 if ranked 1st, +50 if ranked 2nd, +25 if ranked 3rd, -10 if ranked third-to-last, -25 if ranked second-to-last, and -50 if ranked last.</li>
+                                <li><strong>Season winner:</strong> +100 if ranked 1st, +75 if ranked 2nd, +50 if ranked 3rd, -25 if ranked third-to-last, -50 if ranked second-to-last, and -75 if ranked last.</li>
+                                <li><strong>Runner-up:</strong> +75 if ranked 1st, +50 if ranked 2nd, +25 if ranked 3rd, -10 if ranked third-to-last, -25 if ranked second-to-last, and -50 if ranked last.</li>
+                                <li><strong>Third place:</strong> +50 if ranked 1st, +25 if ranked 2nd, +10 if ranked 3rd, -5 if ranked third-to-last, -10 if ranked second-to-last, and -25 if ranked last.</li>
                             </ol>
                         </details>
                         <details>
@@ -1430,6 +1475,78 @@
                 </div>
             </section>
 
+            <section class="section" id="whatif" aria-labelledby="whatIfTitle">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">What-If report</p>
+                        <h2 class="title-row"><span id="whatIfTitle">Stress-test one result before it happens.</span><button class="info-button" type="button" data-help="whatIfReport" aria-label="Explain What-If report">i</button></h2>
+                    </div>
+                    <span class="season-badge" id="whatIfSeasonBadge">Big Brother 28</span>
+                </div>
+                <div class="what-if-grid">
+                    <article class="panel">
+                        <div class="panel-heading">
+                            <div>
+                                <p class="eyebrow">Scenario builder</p>
+                                <h2>Choose the result</h2>
+                            </div>
+                        </div>
+                        <div class="what-if-controls">
+                            <label class="field">
+                                <span class="label-row"><span class="label">Result type</span><button class="info-button" type="button" data-help="whatIfEvent" aria-label="Explain result type">i</button></span>
+                                <select id="whatIfEventSelect">
+                                    <option value="hoh">Head of Household</option>
+                                    <option value="veto">Veto</option>
+                                    <option value="offBlock">Gets off the block</option>
+                                    <option value="other">Other competition</option>
+                                    <option value="buyBack">Buy back</option>
+                                    <option value="americaFavorite">America's Favorite</option>
+                                    <option value="winner">Season winner</option>
+                                    <option value="runnerUp">Runner-up</option>
+                                    <option value="thirdPlace">Third place</option>
+                                </select>
+                            </label>
+                            <label class="field">
+                                <span class="label-row"><span class="label">Houseguest</span><button class="info-button" type="button" data-help="whatIfContestant" aria-label="Explain What-If houseguest">i</button></span>
+                                <select id="whatIfContestantSelect"></select>
+                            </label>
+                            <label class="field">
+                                <span class="label-row"><span class="label">Focus entry</span><button class="info-button" type="button" data-help="whatIfFocus" aria-label="Explain What-If focus entry">i</button></span>
+                                <select id="whatIfFocusSelect"></select>
+                            </label>
+                        </div>
+                    </article>
+
+                    <article class="panel">
+                        <div class="panel-heading">
+                            <div>
+                                <p class="eyebrow">Projected fallout</p>
+                                <h2>Leaderboard after the scenario</h2>
+                            </div>
+                        </div>
+                        <div class="what-if-results">
+                            <div class="comparison-output" id="whatIfCards"></div>
+                            <div class="what-if-blurb" id="whatIfBlurb"></div>
+                            <div class="table-wrap">
+                                <table class="leaderboard-table projection-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Projected</th>
+                                            <th>Entry</th>
+                                            <th>Houseguest rank</th>
+                                            <th>Change</th>
+                                            <th>Projected total</th>
+                                            <th>Rank move</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="whatIfLeaderboardBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
             <section class="section" id="leaderboard" aria-labelledby="leaderboardTitle">
                 <div class="section-heading">
                     <div>
@@ -1611,6 +1728,13 @@
             contestantRankSelect: document.querySelector("#contestantRankSelect"),
             contestantOutput: document.querySelector("#contestantOutput"),
             contestantEvents: document.querySelector("#contestantEvents"),
+            whatIfSeasonBadge: document.querySelector("#whatIfSeasonBadge"),
+            whatIfEventSelect: document.querySelector("#whatIfEventSelect"),
+            whatIfContestantSelect: document.querySelector("#whatIfContestantSelect"),
+            whatIfFocusSelect: document.querySelector("#whatIfFocusSelect"),
+            whatIfCards: document.querySelector("#whatIfCards"),
+            whatIfBlurb: document.querySelector("#whatIfBlurb"),
+            whatIfLeaderboardBody: document.querySelector("#whatIfLeaderboardBody"),
             helpPopover: document.querySelector("#helpPopover"),
             helpTitle: document.querySelector("#helpTitle"),
             helpBody: document.querySelector("#helpBody"),
@@ -1720,6 +1844,23 @@
                 title: "Contestant selector",
                 body: "Chooses the Big Brother contestant shown in the detail panel. This does not change the contribution map ranking; it changes the breakdown on the right."
             },
+            whatIfReport: {
+                title: "What-If report",
+                body: "Projects how one hypothetical result would change every entry's score and the full leaderboard.",
+                bullets: ["Pick a result type and houseguest to apply the scoring formula.", "Choose a focus entry to highlight how that one player would be affected.", "The projected leaderboard only adds this one scenario on top of the loaded season's current totals."]
+            },
+            whatIfEvent: {
+                title: "Result type",
+                body: "Chooses which scoring formula to apply to the selected houseguest, such as HOH, Veto, America's Favorite, or a final placement."
+            },
+            whatIfContestant: {
+                title: "Houseguest",
+                body: "The Big Brother contestant who hypothetically earns the selected result."
+            },
+            whatIfFocus: {
+                title: "Focus entry",
+                body: "Highlights one draft entry in the report so you can see their point swing and projected rank movement clearly."
+            },
             leaderboard: {
                 title: "Leaderboard",
                 body: "Shows the loaded season standings, current totals, last-week score, and gap to first place."
@@ -1756,6 +1897,54 @@
                 title: "Load archive",
                 body: "Loads an archived season into the entire dashboard, including charts, Insights Lab, leaderboard, logs, and contestant breakdown."
             }
+        };
+
+        const whatIfScenarios = {
+            hoh: {
+                label: "Head of Household",
+                phrase: "wins Head of Household",
+                score: (rank) => 10 - rank,
+            },
+            veto: {
+                label: "Veto",
+                phrase: "wins Veto",
+                score: (rank) => 10 - rank,
+            },
+            offBlock: {
+                label: "Gets off the block",
+                phrase: "gets off the block",
+                score: (rank) => 7.5 - (rank * 0.75),
+            },
+            other: {
+                label: "Other competition",
+                phrase: "wins another competition",
+                score: (rank) => 5 - (rank * 0.5),
+            },
+            buyBack: {
+                label: "Buy back",
+                phrase: "wins buy back",
+                score: (rank) => 10 - rank,
+            },
+            americaFavorite: {
+                label: "America's Favorite",
+                phrase: "wins America's Favorite",
+                score: (rank, count) => finalBonusForRank(rank, count, [75, 50, 25], [-50, -25, -10]),
+            },
+            winner: {
+                label: "Season winner",
+                phrase: "wins the season",
+                score: (rank, count) => finalBonusForRank(rank, count, [100, 75, 50], [-75, -50, -25]),
+            },
+            runnerUp: {
+                label: "Runner-up",
+                phrase: "finishes runner-up",
+                score: (rank, count) => finalBonusForRank(rank, count, [75, 50, 25], [-50, -25, -10]),
+            },
+            thirdPlace: {
+                label: "Third place",
+                phrase: "finishes third",
+                score: (rank, count) => finalBonusForRank(rank, count, [50, 25, 10], [-25, -10, -5]),
+            },
         };
 
         function escapeHtml(value) {
@@ -1811,6 +2000,12 @@
 
         function sum(values) {
             return values.reduce((total, value) => total + Number(value || 0), 0);
+        }
+
+        function finalBonusForRank(rank, contestantCount, positive, negative) {
+            if (rank < positive.length) return positive[rank];
+            const reverseIndex = contestantCount - 1 - rank;
+            return reverseIndex < negative.length ? negative[reverseIndex] : 0;
         }
 
         function mean(values) {
@@ -1975,6 +2170,21 @@
                 : '<option value="0">No rankings</option>';
             els.contestantRankSelect.value = "0";
             updateContestantRankControlState();
+        }
+
+        function contestantNamesFromPicks() {
+            const names = new Set(contestants.map((contestant) => contestant.name));
+            (activeSeason.picksData || []).forEach((row) => row.slice(1).forEach((name) => name && names.add(name)));
+            return [...names].sort((a, b) => a.localeCompare(b));
+        }
+
+        function populateWhatIfControls() {
+            els.whatIfSeasonBadge.textContent = activeSeason.label;
+            const contestantOptions = contestantNamesFromPicks().map((name) => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join("");
+            els.whatIfContestantSelect.innerHTML = contestantOptions || '<option value="">No houseguests</option>';
+            const focusOptions = players.map((player) => `<option value="${escapeHtml(player.name)}">${escapeHtml(player.name)}</option>`).join("");
+            els.whatIfFocusSelect.innerHTML = focusOptions || '<option value="">No entries</option>';
+            els.whatIfFocusSelect.value = players[0]?.name || "";
         }
 
         function renderSummary() {
@@ -2380,6 +2590,98 @@
             renderContestantDetails();
         }
 
+        function rankMoveLabel(move) {
+            if (move > 0) return `Up ${move}`;
+            if (move < 0) return `Down ${Math.abs(move)}`;
+            return "No move";
+        }
+
+        function rankMoveClass(move) {
+            if (move > 0) return "rank-up";
+            if (move < 0) return "rank-down";
+            return "";
+        }
+
+        function calculateWhatIfRows() {
+            const scenario = whatIfScenarios[els.whatIfEventSelect.value] || whatIfScenarios.hoh;
+            const contestant = els.whatIfContestantSelect.value;
+            const picksByPlayer = new Map((activeSeason.picksData || []).map((row) => [row[0], row.slice(1)]));
+            const rows = players.map((player, index) => {
+                const picks = picksByPlayer.get(player.name) || [];
+                const rank = picks.findIndex((pick) => pick === contestant);
+                const contestantCount = picks.length || contestantNamesFromPicks().length || 1;
+                const delta = rank >= 0 ? scenario.score(rank, contestantCount) : 0;
+                return {
+                    name: player.name,
+                    currentRank: Number(player.rank || index + 1),
+                    currentTotal: Number(player.total || 0),
+                    delta,
+                    projectedTotal: Number(player.total || 0) + delta,
+                    pickRank: rank >= 0 ? rank + 1 : null,
+                };
+            });
+
+            return rows
+                .sort((a, b) => b.projectedTotal - a.projectedTotal || b.delta - a.delta || a.currentRank - b.currentRank)
+                .map((row, index) => ({
+                    ...row,
+                    projectedRank: index + 1,
+                    rankMove: row.currentRank - (index + 1),
+                }));
+        }
+
+        function renderWhatIf() {
+            const scenario = whatIfScenarios[els.whatIfEventSelect.value] || whatIfScenarios.hoh;
+            const contestant = els.whatIfContestantSelect.value;
+            const focusName = els.whatIfFocusSelect.value || players[0]?.name || "";
+            if (!players.length || !(activeSeason.picksData || []).length || !contestant) {
+                els.whatIfCards.innerHTML = '<article class="comparison-card"><span>No scenario</span><strong>Load archive data</strong><p>The What-If report needs draft picks and current standings.</p></article>';
+                els.whatIfBlurb.textContent = "Load an archived season to test how a hypothetical competition result would reshape the leaderboard.";
+                els.whatIfLeaderboardBody.innerHTML = '<tr><td colspan="6">No projection available.</td></tr>';
+                return;
+            }
+
+            const rows = calculateWhatIfRows();
+            const focus = rows.find((row) => row.name === focusName) || rows[0];
+            const projectedLeader = rows[0];
+            const currentLeader = players[0];
+            const biggestGain = [...rows].sort((a, b) => b.delta - a.delta)[0];
+            const biggestLoss = [...rows].sort((a, b) => a.delta - b.delta)[0];
+            const rankChanges = rows.filter((row) => row.rankMove !== 0).length;
+            const leaderPhrase = currentLeader?.name === projectedLeader.name
+                ? `${escapeHtml(projectedLeader.name)} would stay in first`
+                : `the lead would flip from ${escapeHtml(currentLeader?.name || "the current leader")} to ${escapeHtml(projectedLeader.name)}`;
+            const focusDeltaPhrase = focus.delta === 0
+                ? "would not gain or lose points"
+                : `would ${focus.delta > 0 ? "gain" : "lose"} ${formatPoint(Math.abs(focus.delta))} points`;
+            const focusRankPhrase = focus.rankMove === 0
+                ? `hold ${ordinal(focus.projectedRank)} place`
+                : `${focus.rankMove > 0 ? "climb" : "drop"} ${Math.abs(focus.rankMove)} spot${Math.abs(focus.rankMove) === 1 ? "" : "s"} to ${ordinal(focus.projectedRank)} place`;
+            const focusPickPhrase = focus.pickRank
+                ? `they ranked ${contestant} #${focus.pickRank}`
+                : `${contestant} was not on their draft list`;
+
+            els.whatIfCards.innerHTML = `
+                <article class="comparison-card"><span>Focus impact</span><strong>${escapeHtml(focus.name)}</strong><p>${signed(focus.delta)} points because ${escapeHtml(focusPickPhrase)}.</p></article>
+                <article class="comparison-card"><span>Projected leader</span><strong>${escapeHtml(projectedLeader.name)}</strong><p>${formatPoint(projectedLeader.projectedTotal)} projected points after this scenario.</p></article>
+                <article class="comparison-card"><span>Biggest swing</span><strong>${escapeHtml(biggestGain.name)}</strong><p>Best gain: ${signed(biggestGain.delta)}. Worst hit: ${escapeHtml(biggestLoss.name)} at ${signed(biggestLoss.delta)}.</p></article>
+                <article class="comparison-card"><span>Rank movement</span><strong>${rankChanges}</strong><p>${rankChanges === 1 ? "entry changes" : "entries change"} projected rank.</p></article>
+            `;
+
+            els.whatIfBlurb.textContent = `What-If report: If ${contestant} ${scenario.phrase}, ${focus.name} ${focusDeltaPhrase} because ${focusPickPhrase}, and would ${focusRankPhrase}. On the full leaderboard, ${leaderPhrase}; ${biggestGain.name} benefits most (${signed(biggestGain.delta)}), while ${biggestLoss.name} is hurt most (${signed(biggestLoss.delta)}).`;
+
+            els.whatIfLeaderboardBody.innerHTML = rows.map((row) => `
+                <tr class="${row.name === focus.name ? "focus-row" : ""}">
+                    <td class="rank-cell">#${row.projectedRank}</td>
+                    <td><strong>${escapeHtml(row.name)}</strong></td>
+                    <td>${row.pickRank ? `#${row.pickRank}` : "Unranked"}</td>
+                    <td>${signed(row.delta)}</td>
+                    <td>${formatPoint(row.projectedTotal)}</td>
+                    <td class="${rankMoveClass(row.rankMove)}">${rankMoveLabel(row.rankMove)}</td>
+                </tr>
+            `).join("");
+        }
+
         function setFocusWeek(index, options = {}) {
             const nextIndex = clamp(index, 0, Math.max(0, weekLabels.length - 1));
             const changed = state.focusWeek !== nextIndex;
@@ -2498,6 +2800,7 @@
             renderDataTables();
             renderLogs();
             renderArchive();
+            renderWhatIf();
             updateCharts();
         }
 
@@ -2513,6 +2816,7 @@
             populateSeasonControls();
             populateInsightControls();
             populateContestantControls();
+            populateWhatIfControls();
             renderAll();
         }
 
@@ -2533,6 +2837,7 @@
         els.seasonSelect.addEventListener("change", (event) => setActiveSeason(event.target.value));
         els.archiveSeasonSelect.addEventListener("change", (event) => event.target.value && setActiveSeason(event.target.value));
         [els.contestantSelect, els.contestantMode, els.contestantTimeMode, els.contestantWeekSelect, els.contestantRankSelect].forEach((control) => control.addEventListener("change", renderContestants));
+        [els.whatIfEventSelect, els.whatIfContestantSelect, els.whatIfFocusSelect].forEach((control) => control.addEventListener("change", renderWhatIf));
         els.trendChart.addEventListener("pointermove", handleTrendPointerMove);
         els.trendChart.addEventListener("pointerleave", handleTrendPointerLeave);
         document.querySelector("#resetView").addEventListener("click", () => {
