@@ -1573,6 +1573,14 @@
             return players.filter((player) => state.selected.has(player.name));
         }
 
+        function weeksThroughFocus() {
+            return weekLabels.map((_, index) => index).filter((index) => index <= state.focusWeek);
+        }
+
+        function weeklyThroughFocus(player) {
+            return (player?.weekly || []).slice(0, state.focusWeek + 1);
+        }
+
         function el(name, attrs = {}, text = "") {
             const node = document.createElementNS(svgNS, name);
             Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, value));
@@ -1966,12 +1974,20 @@
             }
             const leader = [...selected].sort((a, b) => cumulativeAt(b, state.focusWeek) - cumulativeAt(a, state.focusWeek))[0];
             const weeklyWinner = [...selected].sort((a, b) => weeklyAt(b, state.focusWeek) - weeklyAt(a, state.focusWeek))[0];
-            const volatile = [...selected].sort((a, b) => b.volatility - a.volatility)[0];
-            const momentum = [...selected].sort((a, b) => b.momentum3 - a.momentum3)[0];
-            const steady = [...selected].sort((a, b) => a.volatility - b.volatility)[0];
+            const volatilityToFocus = (player) => standardDeviation(weeklyThroughFocus(player));
+            const momentumToFocus = (player) => sum(weeklyThroughFocus(player).slice(-3));
+            const positiveWeeksToFocus = (player) => weeklyThroughFocus(player).filter((score) => score > 0).length;
+            const negativeWeeksToFocus = (player) => weeklyThroughFocus(player).filter((score) => score < 0).length;
+            const worstWeekToFocus = (player) => {
+                const weeks = weeklyThroughFocus(player);
+                return weeks.length ? Math.min(...weeks) : 0;
+            };
+            const volatile = [...selected].sort((a, b) => volatilityToFocus(b) - volatilityToFocus(a))[0];
+            const momentum = [...selected].sort((a, b) => momentumToFocus(b) - momentumToFocus(a))[0];
+            const steady = [...selected].sort((a, b) => volatilityToFocus(a) - volatilityToFocus(b))[0];
             const floor = [...selected].sort((a, b) => {
-                const worstA = Math.min(...(a.weekly || [0]));
-                const worstB = Math.min(...(b.weekly || [0]));
+                const worstA = worstWeekToFocus(a);
+                const worstB = worstWeekToFocus(b);
                 return worstB - worstA;
             })[0];
             const rankMover = [...selected].sort((a, b) => {
@@ -1985,9 +2001,9 @@
                 <article class="insight-card"><span>${activeWeekLabel()} leader</span><strong>${escapeHtml(leader.name)}</strong><p>${formatPoint(cumulativeAt(leader, state.focusWeek))} cumulative points, ranked ${ordinal(leader.rankSeries[state.focusWeek])} overall.</p></article>
                 <article class="insight-card"><span>Weekly hit</span><strong>${escapeHtml(weeklyWinner.name)}</strong><p>${signed(weeklyAt(weeklyWinner, state.focusWeek))} points in ${activeWeekLabel()}.</p></article>
                 <article class="insight-card"><span>Rank pressure</span><strong>${escapeHtml(rankMover.name)}</strong><p>${rankDelta === 0 ? "Held position" : `${rankDelta > 0 ? "Climbed" : "Dropped"} ${Math.abs(rankDelta)} spot${Math.abs(rankDelta) === 1 ? "" : "s"}`} into ${ordinal(rankMover.rankSeries[state.focusWeek])}.</p></article>
-                <article class="insight-card"><span>Chaos meter</span><strong>${escapeHtml(volatile.name)}</strong><p>${formatPoint(volatile.volatility)} point weekly volatility, with ${volatile.positiveWeeks} positive and ${volatile.negativeWeeks} negative weeks.</p></article>
-                <article class="insight-card"><span>Hot hand</span><strong>${escapeHtml(momentum.name)}</strong><p>${signed(momentum.momentum3)} points over the last 3 scored weeks.</p></article>
-                <article class="insight-card"><span>Safest floor</span><strong>${escapeHtml(floor.name)}</strong><p>Worst weekly result: ${signed(Math.min(...(floor.weekly || [0])))}. Steadiest entry: ${escapeHtml(steady.name)} (${formatPoint(steady.volatility)} volatility).</p></article>
+                <article class="insight-card"><span>Chaos meter</span><strong>${escapeHtml(volatile.name)}</strong><p>${formatPoint(volatilityToFocus(volatile))} point weekly volatility through ${activeWeekLabel()}, with ${positiveWeeksToFocus(volatile)} positive and ${negativeWeeksToFocus(volatile)} negative weeks.</p></article>
+                <article class="insight-card"><span>Hot hand</span><strong>${escapeHtml(momentum.name)}</strong><p>${signed(momentumToFocus(momentum))} points over the last 3 scored weeks through ${activeWeekLabel()}.</p></article>
+                <article class="insight-card"><span>Safest floor</span><strong>${escapeHtml(floor.name)}</strong><p>Worst weekly result through ${activeWeekLabel()}: ${signed(worstWeekToFocus(floor))}. Steadiest entry: ${escapeHtml(steady.name)} (${formatPoint(volatilityToFocus(steady))} volatility).</p></article>
             `;
         }
 
@@ -1999,15 +2015,16 @@
                 els.comparisonWeeks.innerHTML = "";
                 return;
             }
-            const totalDelta = playerA.total - playerB.total;
+            const focusWeeks = weeksThroughFocus();
             const focusDelta = cumulativeAt(playerA, state.focusWeek) - cumulativeAt(playerB, state.focusWeek);
-            const weeksWonA = weekLabels.filter((_, index) => weeklyAt(playerA, index) > weeklyAt(playerB, index)).length;
-            const weeksWonB = weekLabels.filter((_, index) => weeklyAt(playerB, index) > weeklyAt(playerA, index)).length;
-            const bestDelta = weekLabels.map((_, index) => ({ index, delta: weeklyAt(playerA, index) - weeklyAt(playerB, index) })).sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta)).slice(0, 5);
+            const weeklyDelta = weeklyAt(playerA, state.focusWeek) - weeklyAt(playerB, state.focusWeek);
+            const weeksWonA = focusWeeks.filter((index) => weeklyAt(playerA, index) > weeklyAt(playerB, index)).length;
+            const weeksWonB = focusWeeks.filter((index) => weeklyAt(playerB, index) > weeklyAt(playerA, index)).length;
+            const bestDelta = focusWeeks.map((index) => ({ index, delta: weeklyAt(playerA, index) - weeklyAt(playerB, index) })).sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta)).slice(0, 5);
             els.comparisonOutput.innerHTML = `
-                <article class="comparison-card"><span>Total gap</span><strong>${signed(totalDelta)}</strong><p>${escapeHtml(totalDelta >= 0 ? playerA.name : playerB.name)} leads overall.</p></article>
-                <article class="comparison-card"><span>${activeWeekLabel()} gap</span><strong>${signed(focusDelta)}</strong><p>Cumulative margin at the focus week.</p></article>
-                <article class="comparison-card"><span>Week wins</span><strong>${weeksWonA}-${weeksWonB}</strong><p>${escapeHtml(playerA.name)} weekly wins versus ${escapeHtml(playerB.name)}.</p></article>
+                <article class="comparison-card"><span>Through ${activeWeekLabel()}</span><strong>${signed(focusDelta)}</strong><p>${escapeHtml(focusDelta >= 0 ? playerA.name : playerB.name)} leads through the focus week.</p></article>
+                <article class="comparison-card"><span>${activeWeekLabel()} swing</span><strong>${signed(weeklyDelta)}</strong><p>Single-week margin at the focus week.</p></article>
+                <article class="comparison-card"><span>Week wins to date</span><strong>${weeksWonA}-${weeksWonB}</strong><p>${escapeHtml(playerA.name)} weekly wins versus ${escapeHtml(playerB.name)} through ${activeWeekLabel()}.</p></article>
             `;
             const maxAbs = Math.max(1, ...bestDelta.map((item) => Math.abs(item.delta)));
             els.comparisonWeeks.innerHTML = bestDelta.map((item) => {
@@ -2051,13 +2068,17 @@
             const weekIndex = Number(els.contestantWeekSelect.value || 0);
             const rank = Number(els.contestantRankSelect.value || 0);
             const simulatedWeekly = contestant.weeklyByRank?.[rank] || [];
+            const isWeekly = els.contestantTimeMode.value === "weekly";
             const simulatedCumulative = sum(simulatedWeekly.slice(0, weekIndex + 1));
             const actualCumulative = sum(contestant.actualWeekly.slice(0, weekIndex + 1));
+            const simulatedWindowValue = isWeekly ? Number(simulatedWeekly[weekIndex] || 0) : simulatedCumulative;
+            const actualWindowValue = isWeekly ? Number(contestant.actualWeekly[weekIndex] || 0) : actualCumulative;
+            const windowLabel = isWeekly ? `in ${activeWeekLabelFor(weekIndex)}` : `through ${activeWeekLabelFor(weekIndex)}`;
             const selectedValue = contestantValue(contestant, weekIndex);
             els.contestantOutput.innerHTML = `
-                <article class="comparison-card"><span>Selected value</span><strong>${signed(selectedValue)}</strong><p>${els.contestantMode.value === "actual" ? "Actual aggregate draft impact" : `If ranked #${rank + 1}`} ${els.contestantTimeMode.value === "weekly" ? `in ${activeWeekLabelFor(weekIndex)}` : `through ${activeWeekLabelFor(weekIndex)}`}.</p></article>
-                <article class="comparison-card"><span>Actual total</span><strong>${signed(contestant.actualTotal)}</strong><p>Total points created across all submitted rankings.</p></article>
-                <article class="comparison-card"><span>Rank #${rank + 1} cumulative</span><strong>${signed(simulatedCumulative)}</strong><p>Single-entry value at that ranking through the selected week. Actual aggregate: ${signed(actualCumulative)}.</p></article>
+                <article class="comparison-card"><span>Selected value</span><strong>${signed(selectedValue)}</strong><p>${els.contestantMode.value === "actual" ? "Actual aggregate draft impact" : `If ranked #${rank + 1}`} ${windowLabel}.</p></article>
+                <article class="comparison-card"><span>Actual ${isWeekly ? "week" : "to date"}</span><strong>${signed(actualWindowValue)}</strong><p>Aggregate points from all submitted rankings ${windowLabel}.</p></article>
+                <article class="comparison-card"><span>Rank #${rank + 1} ${isWeekly ? "week" : "to date"}</span><strong>${signed(simulatedWindowValue)}</strong><p>Single-entry value at that ranking ${windowLabel}. Actual aggregate: ${signed(actualWindowValue)}.</p></article>
             `;
             const events = (contestant.events || []).filter((event) => event.week <= weekIndex).slice(-8).reverse();
             els.contestantEvents.innerHTML = events.length
