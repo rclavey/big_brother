@@ -1537,7 +1537,7 @@
                                 <td>
                                     <div class="scorebar">
                                         <strong>{{ player.totalLabel }}</strong>
-                                        <span><i style="width: {{ (player.total / leader_points * 100) if leader_points else 0 }}%"></i></span>
+                                        <span><i style="width: 0"></i></span>
                                     </div>
                                 </td>
                                 <td>{{ player.lastWeek }}</td>
@@ -1726,7 +1726,7 @@
         </aside>
     </div>
 
-    <script id="seasonData" type="application/json">{{ seasons | tojson }}</script>
+    <script id="seasonData" type="text/plain">{{ seasons | tojson }}</script>
     <script>
         const seasons = JSON.parse(document.querySelector("#seasonData").textContent);
         const palette = ["#087f73", "#b7323c", "#b8831d", "#2f69a5", "#6f5aa8", "#2f8655", "#9a5d2f", "#4f7f8f", "#8d3d5b", "#5b6f25"];
