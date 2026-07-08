@@ -2,9 +2,14 @@ import pandas as pd
 import numpy as np
 import scipy.stats as stats
 import matplotlib.pyplot as plt
+import os
 
 # Load the picks data
-picks_file = '/Users/richie/big_brother/data/picks.csv'
+base_dir = os.path.dirname(os.path.abspath(__file__))
+data_dir = os.path.join(base_dir, 'data')
+current_season_token = 'bb28'
+picks_file = os.path.join(data_dir, f'picks_{current_season_token}.csv')
+stats_file = os.path.join(data_dir, f'descriptive_statistics_{current_season_token}.txt')
 picks_df = pd.read_csv(picks_file)
 
 # Remove the first column (names)
@@ -64,7 +69,7 @@ for contestant in unique_contestants:
 average_list.sort(key=lambda x: x[1])
 
 # Write the results to a text file
-with open('descriptive_statistics.txt', 'w') as file:
+with open(stats_file, 'w') as file:
     for contestant, stats in descriptive_stats.items():
         file.write(f"{contestant}:\n")
         for stat, value in stats.items():
@@ -90,5 +95,4 @@ plt.xlabel('Participants')
 plt.ylabel('Rank')
 plt.title('Ranking of Contestants')
 plt.legend()
-plt.savefig('rankings_plot.png')
-
+plt.savefig(os.path.join(base_dir, 'rankings_plot.png'))

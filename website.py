@@ -11,8 +11,11 @@ app.config['SECRET_KEY'] = 'your_secret_key'
 base_dir = os.path.dirname(os.path.abspath(__file__))
 data_dir = os.path.join(base_dir, 'data')
 images_dir = os.path.join(base_dir, 'static', 'images')
-log_file = os.path.join(data_dir, 'test_log.csv')
-points_file = os.path.join(data_dir,'points.csv')
+current_season_token = 'bb28'
+picks_file = os.path.join(data_dir, f'picks_{current_season_token}.csv')
+winners_file = os.path.join(data_dir, f'winners_{current_season_token}.csv')
+points_file = os.path.join(data_dir, f'points_{current_season_token}.csv')
+log_file = os.path.join(data_dir, f'log_{current_season_token}.csv')
 
 # Ensure directories exist
 os.makedirs(images_dir, exist_ok=True)
@@ -24,6 +27,8 @@ def read_logs_from_csv(filename):
         with open(filename, 'r') as file:
             reader = csv.reader(file)
             for row in reader:
+                if not row or not row[0].strip():
+                    continue
                 log_entry = row[0]
                 player_name = log_entry.split()[0]  # Extract the player's name
                 if player_name not in logs:
@@ -43,6 +48,8 @@ def read_picks_from_csv(filename):
             reader = csv.reader(file)
             headers = next(reader)
             for row in reader:
+                if not row or not row[0].strip():
+                    continue
                 picks[row[0]] = row[1:]
         print(f"Loaded picks from {filename}: {picks}")
     except Exception as e:
@@ -54,47 +61,33 @@ def read_winners_from_csv(filename):
         reader = csv.reader(file)
         data = list(reader)
 
-    hoh_winners = [x for x in data[0][1:] if x != '']
-    veto_winners = [x for x in data[1][1:] if x != '']
-    
-    other_comp_winners_raw = [x for x in data[3][1:] if x != '']
-    evictions = [x for x in data[4][1:] if x != ''] 
-    
-    # Parse off_block as a dictionary of lists
-    off_block_raw = [x for x in data[2][1:] if x != '']
-    off_block = {}
-    for i in range(0, len(off_block_raw), 2):
-        week = int(off_block_raw[i])
-        players = off_block_raw[i + 1].split(',')  # Split multiple players
-        if week in off_block:
-            off_block[week].extend(players)
-        else:
-            off_block[week] = players
-    print(off_block)
-    
-    # Parse other_comp_winners as a dictionary of lists
-    other_comp_winners = {}
-    for i in range(0, len(other_comp_winners_raw), 2):
-        week = int(other_comp_winners_raw[i])
-        winners = other_comp_winners_raw[i + 1].split(',')  # Split multiple winners
-        if week in other_comp_winners:
-            other_comp_winners[week].extend(winners)
-        else:
-            other_comp_winners[week] = winners
-    print(other_comp_winners)
+    def row_values(index):
+        if index >= len(data):
+            return []
+        return [x.strip() for x in data[index][1:] if x.strip()]
 
-    # Parse buy_back as a dictionary of lists
-    buy_back_raw = [x for x in data[5][1:] if x != '']
-    buy_back = {}
-    for i in range(0, len(buy_back_raw), 2):
-        week = int(buy_back_raw[i])
-        winners = buy_back_raw[i + 1].split(',')  # Split multiple winners
-        if week in buy_back:
-            buy_back[week].extend(winners)
-        else:
-            buy_back[week] = winners
+    def parse_week_pairs(values):
+        parsed = {}
+        for i in range(0, len(values) - 1, 2):
+            try:
+                week = int(values[i])
+            except ValueError:
+                continue
+            winners = [winner.strip() for winner in values[i + 1].split(',') if winner.strip()]
+            parsed.setdefault(week, []).extend(winners)
+        return parsed
 
-    americas_favorite = data[6][1] 
+    hoh_winners = row_values(0)
+    veto_winners = row_values(1)
+    off_block_raw = row_values(2)
+    off_block = parse_week_pairs(off_block_raw)
+    if not off_block and off_block_raw:
+        off_block = {week: [player] for week, player in enumerate(off_block_raw)}
+    other_comp_winners = parse_week_pairs(row_values(3))
+    evictions = row_values(4)
+    buy_back = parse_week_pairs(row_values(5))
+    americas_favorite_values = row_values(6)
+    americas_favorite = americas_favorite_values[0] if americas_favorite_values else ''
     
     return hoh_winners, veto_winners, off_block, other_comp_winners, evictions, buy_back, americas_favorite
 
@@ -106,7 +99,7 @@ def read_points_from_csv(filename):
         with open(filename, 'r') as file:
             reader = csv.reader(file)
             headers = next(reader)
-            points = list(reader)
+            points = [row for row in reader if row]
         print(f"Loaded points from {filename}: {points}")
     except Exception as e:
         print(f"Error reading {filename}: {e}")
@@ -281,7 +274,8 @@ def calc_points(hoh_winners, veto_winners, off_block, other_comp_winners, evicti
     with open(points_file, 'w', newline='') as file:
         writer = csv.writer(file)
         # Write the header row
-        writer.writerow(['Player', 'Total Points'] + ['Week ' + str(i + 1) for i in range(len(weekly_scores[next(iter(weekly_scores))]))])
+        week_count = len(next(iter(weekly_scores.values()))) if weekly_scores else 0
+        writer.writerow(['Player', 'Total Points'] + ['Week ' + str(i + 1) for i in range(week_count)])
         # Write each player's total and weekly points
         for player, scores in weekly_scores.items():
             total_points = sum(scores)
@@ -324,15 +318,16 @@ def plot_scores_over_time(weekly_scores):
     plt.close()
 
 # Load data
-picks_headers, picks = read_picks_from_csv(os.path.join(data_dir, 'picks.csv'))
-hoh_winners, veto_winners, off_block, other_comp_winners, evictions, buy_back, americas_favorite = read_winners_from_csv(os.path.join(data_dir, 'winners.csv'))
+picks_headers, picks = read_picks_from_csv(picks_file)
+hoh_winners, veto_winners, off_block, other_comp_winners, evictions, buy_back, americas_favorite = read_winners_from_csv(winners_file)
 
 # Calculate points
 weekly_scores, total_scores = calc_points(hoh_winners, veto_winners, off_block, other_comp_winners, evictions, americas_favorite, buy_back, picks)
 
 # Generate graphs
-plot_total_scores(total_scores)
-plot_scores_over_time(weekly_scores)
+if total_scores and weekly_scores:
+    plot_total_scores(total_scores)
+    plot_scores_over_time(weekly_scores)
 
 # Read raw data for display
 def read_raw_data_from_csv(filename):
@@ -346,9 +341,9 @@ def read_raw_data_from_csv(filename):
         print(f"Error reading {filename}: {e}")
     return data
 
-picks_data = read_raw_data_from_csv(os.path.join(data_dir, 'picks.csv'))
-points_headers, points_data = read_points_from_csv(os.path.join(data_dir, 'points.csv'))
-winners_data_str = read_raw_data_from_csv(os.path.join(data_dir, 'winners.csv'))
+picks_data = read_raw_data_from_csv(picks_file)
+points_headers, points_data = read_points_from_csv(points_file)
+winners_data_str = read_raw_data_from_csv(winners_file)
 
 @app.route('/', methods=['GET'])
 def index():

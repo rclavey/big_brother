@@ -1,4 +1,5 @@
 import csv
+import os
 import matplotlib.pyplot as plt
 import numpy as np
 import smtplib
@@ -28,20 +29,26 @@ def read_winners_from_csv(filename):
         reader = csv.reader(file)
         data = list(reader)
 
-    hoh_winners = [x for x in data[0][1:] if x != '']
-    veto_winners = [x for x in data[1][1:] if x != '']
-    off_block = [x for x in data[2][1:] if x != ''] 
-    other_comp_winners_raw = [x for x in data[3][1:] if x != '']
-    evictions = [x for x in data[4][1:] if x != ''] 
+    def row_values(index):
+        if index >= len(data):
+            return []
+        return [x.strip() for x in data[index][1:] if x.strip()]
+
+    hoh_winners = row_values(0)
+    veto_winners = row_values(1)
+    off_block = row_values(2)
+    other_comp_winners_raw = row_values(3)
+    evictions = row_values(4)
     
     # parse didnt_lose dictionary
     other_comp_winners = {int(other_comp_winners_raw[i]): (other_comp_winners_raw[i+1]) for i in range(0, len(other_comp_winners_raw), 2) if other_comp_winners_raw[i].isdigit()}
     
     # parse the buy_back dictionary
-    buy_back_raw = [x for x in data[5][1:] if x != ''] 
+    buy_back_raw = row_values(5)
     buy_back = {int(buy_back_raw[i]): (buy_back_raw[i+1]) for i in range(0, len(buy_back_raw), 2) if buy_back_raw[i].isdigit()}
 
-    americas_favorite = data[6][1] 
+    americas_favorite_values = row_values(6)
+    americas_favorite = americas_favorite_values[0] if americas_favorite_values else ''
     
     return hoh_winners, veto_winners, off_block, other_comp_winners, evictions, buy_back, americas_favorite
 
@@ -175,8 +182,8 @@ def calc_points(hoh_winners=list, veto_winners=list, off_block=list, other_comp_
 def write_scores_to_csv(filename, total_scores, weekly_scores):
     with open(filename, 'w', newline='') as file:
         writer = csv.writer(file)
-        # Write the header
-        writer.writerow(['name', 'total_points', 'week1_points', 'week2_points', 'week3_points', 'week4_points', 'week5_points', 'week6_points', 'week7_points', 'week8_points', 'week9_points', 'week10_points', 'week11_points', 'week12_points', 'week13_points', 'week14_points', 'week15_points', 'week16_points'])
+        week_count = max((len(scores) for scores in weekly_scores.values()), default=0)
+        writer.writerow(['Player', 'Total Points'] + [f'Week {i + 1}' for i in range(week_count)])
         
         # Loop through each player and their scores
         for player, total_score in total_scores.items():
@@ -275,23 +282,31 @@ def send_email_with_attachments(subject, body, to, email, password, files):
 
 # execute the code
 if __name__ == '__main__':
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    data_dir = os.path.join(base_dir, 'data')
+    current_season_token = 'bb28'
+    picks_file = os.path.join(data_dir, f'picks_{current_season_token}.csv')
+    winners_file = os.path.join(data_dir, f'winners_{current_season_token}.csv')
+    points_file = os.path.join(data_dir, f'points_{current_season_token}.csv')
+
     # get picks from csv file
-    csv_picks = read_picks_from_csv('/Users/richie/Documents/git_hub/big_brother/big_brother/data/picks.csv')
+    csv_picks = read_picks_from_csv(picks_file)
     # get winners from csv file
-    hoh_winners_csv, veto_winners_csv, off_block_csv, other_comp_winners_csv, evictions_csv, buy_back_csv, americas_favorite_csv  = read_winners_from_csv('/Users/richie/Documents/git_hub/big_brother/big_brother/data/winners.csv')
+    hoh_winners_csv, veto_winners_csv, off_block_csv, other_comp_winners_csv, evictions_csv, buy_back_csv, americas_favorite_csv  = read_winners_from_csv(winners_file)
     # get scores from calc_points function
     weekly_scores, total_scores = calc_points(hoh_winners_csv, veto_winners_csv, off_block_csv, other_comp_winners_csv, evictions_csv,americas_favorite_csv, buy_back_csv,csv_picks)
     # write the scores to the csv file
-    write_scores_to_csv('/Users/richie/Documents/git_hub/big_brother/big_brother/data/new_points.csv', total_scores, weekly_scores)
+    write_scores_to_csv(points_file, total_scores, weekly_scores)
     print('Points have been calculated.')
     # plot the total scores as well as the cumulative weekly scores
-    plot_total_scores(total_scores)
-    plot_scores_over_time(weekly_scores)
-    print('Points have been graphed.')
+    if total_scores and weekly_scores:
+        plot_total_scores(total_scores)
+        plot_scores_over_time(weekly_scores)
+        print('Points have been graphed.')
 
     '''
     # email the update to everyone in the email list
-    files = ['cumulative_scores.png', 'total_scores.png', 'picks.csv', 'points.csv', 'winners.csv']
+    files = ['cumulative_scores.png', 'total_scores.png', 'picks_bb28.csv', 'points_bb28.csv', 'winners_bb28.csv']
     subject = "Big Brother 25 Draft"
     body = "Hello everyone and welcome to the final email of the Big Brother 25 Draft! After last night's finale we have our winner, so congratulations to Peggy Shea! Peggy won with 257.25 points, almost double the average amount of points, 133.21! In second was Tia with 226 points, and Shannon came in third with 219.25. I hope to see you all again next year! \n\nPoint Scoring: \n1: Everytime someone wins Head of Houshold you will be awarded points based on the following formula: 10-ranking. Ranking is the order you picked the contestant in with '0' being your favorite player and '15' being your least favorite. \n2: Everytime someone wins The Veto Competition they will be awarded points based on the following formula: 10-ranking. \n3: Everytime someone gets off the block (by any means, whether they were veto holder or not, or if there was a twist) they will be awarded points based off the following formula: 7.5 - 0.75ranking. \n4: Anytime a player wins a competition not otherwise mentioned here they will be awarded points based off the following formula: 5 - 0.5ranking. \n5: In the event a houseguest is evicted from the house, and then returns to play they will be awarded points based on the following formula: 10 - ranking. If the houseguest won a competition to be brought back to the game, points will be awarded for the other competition as well as being brought back to the game. \n6: If you perfectly predict the order in which everyone was evicted in your list, you will be awarded 100 points. \n7:If America's Favorite is your first, second, or third ranked housegust, you will be awarded 75, 50 or 25 points respectively. If they are your sixteenth, fifteenth, or fourteenth choice 50, 25, or 10 points will be subtracted respictively. \n8:If the winner of the game was your first, second, or third ranked houseguest, you will be awarded 100, 75, or 50 points respectively. If the winner was your sixteenth, fifteenth, or fourteenth ranked houseguest, 75, 50, or 25 points will be subtracted respectively. \n9:If the runner-up of the game was your first, second, or third ranked houseguest, you will be awarded 75, 50, or 25 points respectively. If the runner-up of the game was your sixteenth, fifteenth, or fourteenth ranked houseguest, 50, 25, or 10 points will be subtracted respectively.\n10:If the third place houseguest was your first, second, or third ranked houseguest, you will be awarded 50, 25, or 10 points respectively. If the winner was your sixteenth, fifteenth, or fourteenth ranked houseguest, 25, 10, or 5 points will be subtracted respectively. Please note that although the third place houseguest may be known an episode before the winner and runner up, the points for the top three places, America's Favorite, and the perfect line-up will all be awarded at the same time. \nChanges from last year: \n1: You now get a bonus if your list lines up perfectly with the order of evictions. \n2: Now there is only one spot in your list where the housguest will earn you zero points as opposed to in the last few years where only the top six and bottom four positions would add/subtract points.\n3: Getting taken off the block is worth slightly less points. \n4: You can now earn points and have points subtracted from an evicted houseguest getting back into the game.\n5:America's Favorite is now worth slightly more points.  \n\nThanks everyone for playing! \nRichard Lavey "
     to = ["liste emails here"] 

@@ -11,6 +11,15 @@ DATA_DIR = os.path.join(BASE_DIR, 'data')
 OUTPUT_DIR = os.path.join(BASE_DIR, 'docs')
 IMAGE_SRC = os.path.join(BASE_DIR, 'static', 'images')
 IMAGE_DST = os.path.join(OUTPUT_DIR, 'static', 'images')
+ARCHIVE_DATA_DIR = os.path.join(DATA_DIR, 'archived_data')
+CURRENT_SEASON_NUMBER = 28
+CURRENT_SEASON_TOKEN = f'bb{CURRENT_SEASON_NUMBER}'
+CURRENT_SEASON_FILES = {
+    'picks': os.path.join(DATA_DIR, f'picks_{CURRENT_SEASON_TOKEN}.csv'),
+    'winners': os.path.join(DATA_DIR, f'winners_{CURRENT_SEASON_TOKEN}.csv'),
+    'points': os.path.join(DATA_DIR, f'points_{CURRENT_SEASON_TOKEN}.csv'),
+    'log': os.path.join(DATA_DIR, f'log_{CURRENT_SEASON_TOKEN}.csv'),
+}
 
 os.makedirs(IMAGE_DST, exist_ok=True)
 
@@ -21,6 +30,8 @@ def read_logs_from_csv(filename):
         with open(filename, 'r') as file:
             reader = csv.reader(file)
             for row in reader:
+                if not row or not row[0].strip():
+                    continue
                 log_entry = row[0]
                 player_name = log_entry.split()[0]
                 logs.setdefault(player_name, []).append(log_entry)
@@ -37,6 +48,8 @@ def read_picks_from_csv(filename):
             reader = csv.reader(file)
             headers = next(reader)
             for row in reader:
+                if not row or not row[0].strip():
+                    continue
                 picks[row[0]] = row[1:]
     except Exception as e:
         print(f"Error reading {filename}: {e}")
@@ -48,33 +61,33 @@ def read_winners_from_csv(filename):
         reader = csv.reader(file)
         data = list(reader)
 
-    hoh_winners = [x for x in data[0][1:] if x]
-    veto_winners = [x for x in data[1][1:] if x]
+    def row_values(index):
+        if index >= len(data):
+            return []
+        return [x.strip() for x in data[index][1:] if x.strip()]
 
-    other_comp_winners_raw = [x for x in data[3][1:] if x]
-    evictions = [x for x in data[4][1:] if x]
+    def parse_week_pairs(values):
+        parsed = {}
+        for i in range(0, len(values) - 1, 2):
+            try:
+                week = int(values[i])
+            except ValueError:
+                continue
+            players = [player.strip() for player in values[i + 1].split(',') if player.strip()]
+            parsed.setdefault(week, []).extend(players)
+        return parsed
 
-    off_block_raw = [x for x in data[2][1:] if x]
-    off_block = {}
-    for i in range(0, len(off_block_raw), 2):
-        week = int(off_block_raw[i])
-        players = off_block_raw[i + 1].split(',')
-        off_block.setdefault(week, []).extend(players)
-
-    other_comp_winners = {}
-    for i in range(0, len(other_comp_winners_raw), 2):
-        week = int(other_comp_winners_raw[i])
-        winners = other_comp_winners_raw[i + 1].split(',')
-        other_comp_winners.setdefault(week, []).extend(winners)
-
-    buy_back_raw = [x for x in data[5][1:] if x]
-    buy_back = {}
-    for i in range(0, len(buy_back_raw), 2):
-        week = int(buy_back_raw[i])
-        winners = buy_back_raw[i + 1].split(',')
-        buy_back.setdefault(week, []).extend(winners)
-
-    americas_favorite = data[6][1]
+    hoh_winners = row_values(0)
+    veto_winners = row_values(1)
+    off_block_values = row_values(2)
+    off_block = parse_week_pairs(off_block_values)
+    if not off_block and off_block_values:
+        off_block = {week: [player] for week, player in enumerate(off_block_values)}
+    other_comp_winners = parse_week_pairs(row_values(3))
+    evictions = row_values(4)
+    buy_back = parse_week_pairs(row_values(5))
+    americas_favorite_values = row_values(6)
+    americas_favorite = americas_favorite_values[0] if americas_favorite_values else ''
 
     return hoh_winners, veto_winners, off_block, other_comp_winners, evictions, buy_back, americas_favorite
 
@@ -86,7 +99,7 @@ def read_points_from_csv(filename):
         with open(filename, 'r') as file:
             reader = csv.reader(file)
             headers = next(reader)
-            points = list(reader)
+            points = [row for row in reader if row]
     except Exception as e:
         print(f"Error reading {filename}: {e}")
     return headers, points
@@ -107,8 +120,17 @@ def points_rows_to_scores(points_data):
     return weekly_scores, total_scores
 
 
-def calc_points(hoh_winners, veto_winners, off_block, other_comp_winners, evictions, americas_favorite, buy_back, picks):
-    weekly_scores = {player: [0] * (len(hoh_winners) + 1) for player in picks}
+def calc_points(hoh_winners, veto_winners, off_block, other_comp_winners, evictions,
+                americas_favorite, buy_back, picks, points_output_file=None,
+                log_output_file=None):
+    scored_week_count = max(
+        [len(hoh_winners), len(veto_winners)]
+        + [week + 1 for week in off_block]
+        + [week + 1 for week in other_comp_winners]
+        + [week + 1 for week in buy_back],
+        default=0,
+    )
+    weekly_scores = {player: [0] * (scored_week_count + 1 if scored_week_count else 0) for player in picks}
     total_scores = {player: 0 for player in picks}
     points_log = []
     number_of_players = 17 # change if number of players is different than last season
@@ -117,154 +139,140 @@ def calc_points(hoh_winners, veto_winners, off_block, other_comp_winners, evicti
         action = "gained" if points >= 0 else "lost"
         points_log.append([f"{player} {action} {abs(points)} points because {reason} during week {week+1}."])
 
+    def add_points(player, week, points, reason):
+        if week < 0:
+            return
+        while len(weekly_scores[player]) <= week:
+            weekly_scores[player].append(0)
+        weekly_scores[player][week] += points
+        log_points(player, points, reason, week)
+
     for player in picks:
         for idx, winner in enumerate(hoh_winners):
             for ranking, pick in enumerate(picks[player]):
                 if pick == winner:
                     points = 10 - ranking
-                    weekly_scores[player][idx] += points
-                    log_points(player, points, f"{pick} won HOH", idx)
+                    add_points(player, idx, points, f"{pick} won HOH")
 
         for idx, winner in enumerate(veto_winners):
             for ranking, pick in enumerate(picks[player]):
                 if pick == winner:
                     points = 10 - ranking
-                    weekly_scores[player][idx] += points
-                    log_points(player, points, f"{pick} won Veto", idx)
+                    add_points(player, idx, points, f"{pick} won Veto")
 
         for week, players in off_block.items():
             for off_block_player in players:
                 for ranking, pick in enumerate(picks[player]):
                     if pick == off_block_player:
                         points = 7.5 - (ranking * 0.75)
-                        weekly_scores[player][week] += points
-                        log_points(player, points, f"{pick} got off the block", week)
+                        add_points(player, week, points, f"{pick} got off the block")
 
         for week, winners in other_comp_winners.items():
             for winner in winners:
                 for ranking, pick in enumerate(picks[player]):
                     if pick == winner:
                         points = 5 - (ranking * 0.5)
-                        weekly_scores[player][week] += points
-                        log_points(player, points, f"{pick} won another competition", week)
+                        add_points(player, week, points, f"{pick} won another competition")
 
         for week, winners in buy_back.items():
             for winner in winners:
                 for ranking, pick in enumerate(picks[player]):
                     if pick == winner:
                         points = 10 - ranking
-                        weekly_scores[player][week] += points
-                        log_points(player, points, f"{pick} won buy back", week)
+                        add_points(player, week, points, f"{pick} won buy back")
 
         if len(evictions) == number_of_players + len(buy_back):
+            final_week_index = len(hoh_winners)
             if picks[player] == evictions[::-1]:
                 points = 100
-                weekly_scores[player][-1] += points
-                log_points(player, points, "perfect prediction of evictions", len(hoh_winners))
+                add_points(player, final_week_index, points, "perfect prediction of evictions")
             if picks[player][0] == americas_favorite:
-                weekly_scores[player][-1] += 75
+                add_points(player, final_week_index, 75, f"{americas_favorite} was America's Favorite")
             elif picks[player][1] == americas_favorite:
-                weekly_scores[player][-1] += 50
+                add_points(player, final_week_index, 50, f"{americas_favorite} was America's Favorite")
             elif picks[player][2] == americas_favorite:
-                weekly_scores[player][-1] += 25
+                add_points(player, final_week_index, 25, f"{americas_favorite} was America's Favorite")
             elif picks[player][-1] == americas_favorite:
-                weekly_scores[player][-1] -= 50
+                add_points(player, final_week_index, -50, f"{americas_favorite} was America's Favorite")
             elif picks[player][-2] == americas_favorite:
-                weekly_scores[player][-1] -= 25
+                add_points(player, final_week_index, -25, f"{americas_favorite} was America's Favorite")
             elif picks[player][-3] == americas_favorite:
-                weekly_scores[player][-1] -= 10
-
-            final_week_index = len(hoh_winners)
+                add_points(player, final_week_index, -10, f"{americas_favorite} was America's Favorite")
 
             season_winner = evictions[-1]
             if picks[player][0] == season_winner:
                 points = 100
-                weekly_scores[player][-1] += points
-                log_points(player, points, f"{season_winner} won the season and you ranked them first", final_week_index)
+                add_points(player, final_week_index, points, f"{season_winner} won the season and you ranked them first")
             elif picks[player][1] == season_winner:
                 points = 75
-                weekly_scores[player][-1] += points
-                log_points(player, points, f"{season_winner} won the season and you ranked them second", final_week_index)
+                add_points(player, final_week_index, points, f"{season_winner} won the season and you ranked them second")
             elif picks[player][2] == season_winner:
                 points = 50
-                weekly_scores[player][-1] += points
-                log_points(player, points, f"{season_winner} won the season and you ranked them third", final_week_index)
+                add_points(player, final_week_index, points, f"{season_winner} won the season and you ranked them third")
             elif picks[player][-1] == season_winner:
                 points = -75
-                weekly_scores[player][-1] += points
-                log_points(player, points, f"{season_winner} won the season but you ranked them last", final_week_index)
+                add_points(player, final_week_index, points, f"{season_winner} won the season but you ranked them last")
             elif picks[player][-2] == season_winner:
                 points = -50
-                weekly_scores[player][-1] += points
-                log_points(player, points, f"{season_winner} won the season but you ranked them second to last", final_week_index)
+                add_points(player, final_week_index, points, f"{season_winner} won the season but you ranked them second to last")
             elif picks[player][-3] == season_winner:
                 points = -25
-                weekly_scores[player][-1] += points
-                log_points(player, points, f"{season_winner} won the season but you ranked them third to last", final_week_index)
+                add_points(player, final_week_index, points, f"{season_winner} won the season but you ranked them third to last")
 
             runner_up = evictions[-2]
             if picks[player][0] == runner_up:
                 points = 75
-                weekly_scores[player][-1] += points
-                log_points(player, points, f"{runner_up} finished runner-up and you ranked them first", final_week_index)
+                add_points(player, final_week_index, points, f"{runner_up} finished runner-up and you ranked them first")
             elif picks[player][1] == runner_up:
                 points = 50
-                weekly_scores[player][-1] += points
-                log_points(player, points, f"{runner_up} finished runner-up and you ranked them second", final_week_index)
+                add_points(player, final_week_index, points, f"{runner_up} finished runner-up and you ranked them second")
             elif picks[player][2] == runner_up:
                 points = 25
-                weekly_scores[player][-1] += points
-                log_points(player, points, f"{runner_up} finished runner-up and you ranked them third", final_week_index)
+                add_points(player, final_week_index, points, f"{runner_up} finished runner-up and you ranked them third")
             elif picks[player][-1] == runner_up:
                 points = -50
-                weekly_scores[player][-1] += points
-                log_points(player, points, f"{runner_up} finished runner-up but you ranked them last", final_week_index)
+                add_points(player, final_week_index, points, f"{runner_up} finished runner-up but you ranked them last")
             elif picks[player][-2] == runner_up:
                 points = -25
-                weekly_scores[player][-1] += points
-                log_points(player, points, f"{runner_up} finished runner-up but you ranked them second to last", final_week_index)
+                add_points(player, final_week_index, points, f"{runner_up} finished runner-up but you ranked them second to last")
             elif picks[player][-3] == runner_up:
                 points = -10
-                weekly_scores[player][-1] += points
-                log_points(player, points, f"{runner_up} finished runner-up but you ranked them third to last", final_week_index)
+                add_points(player, final_week_index, points, f"{runner_up} finished runner-up but you ranked them third to last")
 
             third_place = evictions[-3]
             if picks[player][0] == third_place:
                 points = 50
-                weekly_scores[player][-1] += points
-                log_points(player, points, f"{third_place} finished third and you ranked them first", final_week_index)
+                add_points(player, final_week_index, points, f"{third_place} finished third and you ranked them first")
             elif picks[player][1] == third_place:
                 points = 25
-                weekly_scores[player][-1] += points
-                log_points(player, points, f"{third_place} finished third and you ranked them second", final_week_index)
+                add_points(player, final_week_index, points, f"{third_place} finished third and you ranked them second")
             elif picks[player][2] == third_place:
                 points = 10
-                weekly_scores[player][-1] += points
-                log_points(player, points, f"{third_place} finished third and you ranked them third", final_week_index)
+                add_points(player, final_week_index, points, f"{third_place} finished third and you ranked them third")
             elif picks[player][-1] == third_place:
                 points = -25
-                weekly_scores[player][-1] += points
-                log_points(player, points, f"{third_place} finished third but you ranked them last", final_week_index)
+                add_points(player, final_week_index, points, f"{third_place} finished third but you ranked them last")
             elif picks[player][-2] == third_place:
                 points = -10
-                weekly_scores[player][-1] += points
-                log_points(player, points, f"{third_place} finished third but you ranked them second to last", final_week_index)
+                add_points(player, final_week_index, points, f"{third_place} finished third but you ranked them second to last")
             elif picks[player][-3] == third_place:
                 points = -5
-                weekly_scores[player][-1] += points
-                log_points(player, points, f"{third_place} finished third but you ranked them third to last", final_week_index)
+                add_points(player, final_week_index, points, f"{third_place} finished third but you ranked them third to last")
 
 
     for player in weekly_scores:
         total_scores[player] = sum(weekly_scores[player])
 
-    with open(os.path.join(DATA_DIR, 'log.csv'), 'w', newline='') as file:
+    log_output_file = log_output_file or CURRENT_SEASON_FILES['log']
+    with open(log_output_file, 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(points_log)
 
-    with open(os.path.join(DATA_DIR, 'points.csv'), 'w', newline='') as file:
+    points_output_file = points_output_file or CURRENT_SEASON_FILES['points']
+    with open(points_output_file, 'w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(['Player', 'Total Points'] + [f'Week {i+1}' for i in range(len(weekly_scores[next(iter(weekly_scores))]))])
+        week_count = len(next(iter(weekly_scores.values()))) if weekly_scores else 0
+        writer.writerow(['Player', 'Total Points'] + [f'Week {i+1}' for i in range(week_count)])
         for player, scores in weekly_scores.items():
             writer.writerow([player, sum(scores)] + scores)
 
@@ -503,7 +511,7 @@ def build_contestant_breakdown(picks, hoh_winners, veto_winners, off_block,
 def build_blank_season():
     return {
         'id': 'current',
-        'label': 'Big Brother 28',
+        'label': f'Big Brother {CURRENT_SEASON_NUMBER}',
         'status': 'No current-season scoring data has been added yet.',
         'isArchive': False,
         'isEmpty': True,
@@ -522,7 +530,8 @@ def build_blank_season():
     }
 
 
-def build_season(season_id, label, picks_file, winners_file, points_file, log_file=None, status='Archived season'):
+def build_season(season_id, label, picks_file, winners_file, points_file, log_file=None,
+                 status='Archived season', is_archive=True):
     picks_headers, picks = read_picks_from_csv(picks_file)
     points_headers, points_data = read_points_from_csv(points_file)
     weekly_scores, total_scores = points_rows_to_scores(points_data)
@@ -540,7 +549,7 @@ def build_season(season_id, label, picks_file, winners_file, points_file, log_fi
         'id': season_id,
         'label': label,
         'status': status,
-        'isArchive': True,
+        'isArchive': is_archive,
         'isEmpty': not bool(player_chart_data),
         'playerChartData': player_chart_data,
         'weekLabels': week_labels,
@@ -557,39 +566,79 @@ def build_season(season_id, label, picks_file, winners_file, points_file, log_fi
     }
 
 
-def discover_archive_seasons():
-    seasons = [
-        build_season(
-            'previous',
-            'Big Brother 27',
-            os.path.join(DATA_DIR, 'picks.csv'),
-            os.path.join(DATA_DIR, 'winners.csv'),
-            os.path.join(DATA_DIR, 'points.csv'),
-            os.path.join(DATA_DIR, 'log.csv'),
-            'Most recent completed draft season',
-        )
-    ]
+def has_scoring_data(hoh, veto, off_block, other_comp, evictions, buy_back, americas_favorite):
+    return bool(hoh or veto or off_block or other_comp or evictions or buy_back or americas_favorite)
 
-    archive_dir = os.path.join(DATA_DIR, 'archived_data')
-    if os.path.isdir(archive_dir):
-        for filename in sorted(os.listdir(archive_dir)):
-            match = re.match(r'points_(.+)\.csv$', filename)
+
+def refresh_current_points():
+    picks_headers, picks = read_picks_from_csv(CURRENT_SEASON_FILES['picks'])
+    if not picks:
+        return
+
+    hoh, veto, off_block, other_comp, evictions, buy_back, fav = read_winners_from_csv(CURRENT_SEASON_FILES['winners'])
+    if not has_scoring_data(hoh, veto, off_block, other_comp, evictions, buy_back, fav):
+        return
+
+    calc_points(
+        hoh,
+        veto,
+        off_block,
+        other_comp,
+        evictions,
+        fav,
+        buy_back,
+        picks,
+        points_output_file=CURRENT_SEASON_FILES['points'],
+        log_output_file=CURRENT_SEASON_FILES['log'],
+    )
+
+
+def build_current_season():
+    required_files = [CURRENT_SEASON_FILES['picks'], CURRENT_SEASON_FILES['winners'], CURRENT_SEASON_FILES['points']]
+    if not all(os.path.exists(path) for path in required_files):
+        return build_blank_season()
+
+    return build_season(
+        'current',
+        f'Big Brother {CURRENT_SEASON_NUMBER}',
+        CURRENT_SEASON_FILES['picks'],
+        CURRENT_SEASON_FILES['winners'],
+        CURRENT_SEASON_FILES['points'],
+        CURRENT_SEASON_FILES['log'],
+        'Current draft season',
+        is_archive=False,
+    )
+
+
+def discover_archive_seasons():
+    seasons = []
+    if os.path.isdir(ARCHIVE_DATA_DIR):
+        archive_specs = []
+        for filename in os.listdir(ARCHIVE_DATA_DIR):
+            match = re.match(r'points_bb(\d+)\.csv$', filename)
             if not match:
                 continue
-            suffix = match.group(1)
-            picks_file = os.path.join(archive_dir, f'picks_{suffix}.csv')
-            winners_file = os.path.join(archive_dir, f'winners_{suffix}.csv')
-            points_file = os.path.join(archive_dir, filename)
+            season_number = int(match.group(1))
+            suffix = f'bb{season_number}'
+            picks_file = os.path.join(ARCHIVE_DATA_DIR, f'picks_{suffix}.csv')
+            winners_file = os.path.join(ARCHIVE_DATA_DIR, f'winners_{suffix}.csv')
+            points_file = os.path.join(ARCHIVE_DATA_DIR, filename)
+            log_file = os.path.join(ARCHIVE_DATA_DIR, f'log_{suffix}.csv')
             if os.path.exists(picks_file) and os.path.exists(winners_file):
-                seasons.append(build_season(
-                    f'archive-{suffix}',
-                    f'Big Brother {suffix}',
-                    picks_file,
-                    winners_file,
-                    points_file,
-                    None,
-                    f'Archived season {suffix}',
-                ))
+                archive_specs.append((season_number, picks_file, winners_file, points_file, log_file))
+
+        for season_number, picks_file, winners_file, points_file, log_file in sorted(archive_specs, reverse=True):
+            season_id = 'previous' if season_number == CURRENT_SEASON_NUMBER - 1 else f'archive-{season_number}'
+            status = 'Most recent completed draft season' if season_number == CURRENT_SEASON_NUMBER - 1 else f'Archived season {season_number}'
+            seasons.append(build_season(
+                season_id,
+                f'Big Brother {season_number}',
+                picks_file,
+                winners_file,
+                points_file,
+                log_file if os.path.exists(log_file) else None,
+                status,
+            ))
     return seasons
 
 
@@ -602,7 +651,8 @@ def find_file(*names):
 
 
 def main():
-    current_season = build_blank_season()
+    refresh_current_points()
+    current_season = build_current_season()
     archive_seasons = discover_archive_seasons()
     seasons = [current_season] + archive_seasons
 
