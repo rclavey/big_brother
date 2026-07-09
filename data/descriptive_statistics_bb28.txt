@@ -1,1 +1,154 @@
-No Big Brother 28 picks have been entered yet.
+Kamu:
+  Mean: 11.444444444444445
+  Median: 12.0
+  Mode: No mode
+  Standard Deviation: 5.459163776239221
+  Range: 16
+  Outliers: 0
+
+Lyric:
+  Mean: 11.88888888888889
+  Median: 14.0
+  Mode: No mode
+  Standard Deviation: 4.99876527964533
+  Range: 13
+  Outliers: 0
+
+Haley:
+  Mean: 10.88888888888889
+  Median: 12.0
+  Mode: No mode
+  Standard Deviation: 5.384018417593652
+  Range: 14
+  Outliers: 0
+
+Rick:
+  Mean: 9.11111111111111
+  Median: 12.0
+  Mode: No mode
+  Standard Deviation: 5.506449641495052
+  Range: 14
+  Outliers: 0
+
+Dee:
+  Mean: 11.555555555555555
+  Median: 13.0
+  Mode: No mode
+  Standard Deviation: 4.323350324076382
+  Range: 15
+  Outliers: 0
+
+Jason:
+  Mean: 7.555555555555555
+  Median: 6.0
+  Mode: No mode
+  Standard Deviation: 4.297573245736381
+  Range: 13
+  Outliers: 0
+
+Barrett:
+  Mean: 9.555555555555555
+  Median: 11.0
+  Mode: No mode
+  Standard Deviation: 4.716663394842472
+  Range: 16
+  Outliers: 0
+
+Mallory:
+  Mean: 11.555555555555555
+  Median: 10.0
+  Mode: No mode
+  Standard Deviation: 3.624334762288909
+  Range: 11
+  Outliers: 0
+
+Rome:
+  Mean: 9.555555555555555
+  Median: 11.0
+  Mode: No mode
+  Standard Deviation: 5.479479113750202
+  Range: 14
+  Outliers: 0
+
+Angela:
+  Mean: 6.333333333333333
+  Median: 7.0
+  Mode: No mode
+  Standard Deviation: 4.0551750201988135
+  Range: 11
+  Outliers: 0
+
+Drew:
+  Mean: 8.0
+  Median: 7.0
+  Mode: No mode
+  Standard Deviation: 3.2317865716108862
+  Range: 9
+  Outliers: 0
+
+Chuk:
+  Mean: 7.111111111111111
+  Median: 6.0
+  Mode: No mode
+  Standard Deviation: 2.6434171674156266
+  Range: 9
+  Outliers: 0
+
+Yash:
+  Mean: 9.11111111111111
+  Median: 10.0
+  Mode: No mode
+  Standard Deviation: 3.4138425546082702
+  Range: 11
+  Outliers: 0
+
+Ashley:
+  Mean: 5.777777777777778
+  Median: 6.0
+  Mode: No mode
+  Standard Deviation: 4.130584510098023
+  Range: 13
+  Outliers: 0
+
+Melody:
+  Mean: 6.888888888888889
+  Median: 7.0
+  Mode: No mode
+  Standard Deviation: 3.784308081316978
+  Range: 12
+  Outliers: 0
+
+Latrice:
+  Mean: 6.111111111111111
+  Median: 4.0
+  Mode: No mode
+  Standard Deviation: 4.771313456351975
+  Range: 16
+  Outliers: 0
+
+Taylor:
+  Mean: 10.555555555555555
+  Median: 10.0
+  Mode: No mode
+  Standard Deviation: 4.54877544232416
+  Range: 15
+  Outliers: 0
+
+Average List:
+Ashley: 5.777777777777778
+Latrice: 6.111111111111111
+Angela: 6.333333333333333
+Melody: 6.888888888888889
+Chuk: 7.111111111111111
+Jason: 7.555555555555555
+Drew: 8.0
+Rick: 9.11111111111111
+Yash: 9.11111111111111
+Barrett: 9.555555555555555
+Rome: 9.555555555555555
+Taylor: 10.555555555555555
+Haley: 10.88888888888889
+Kamu: 11.444444444444445
+Dee: 11.555555555555555
+Mallory: 11.555555555555555
+Lyric: 11.88888888888889
