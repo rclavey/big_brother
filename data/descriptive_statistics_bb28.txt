@@ -1,154 +1,154 @@
 Kamu:
-  Mean: 11.444444444444445
+  Mean: 10.842105263157896
   Median: 12.0
   Mode: No mode
-  Standard Deviation: 5.459163776239221
+  Standard Deviation: 4.955200966711503
   Range: 16
   Outliers: 0
 
 Lyric:
-  Mean: 11.88888888888889
-  Median: 14.0
+  Mean: 10.526315789473685
+  Median: 11.0
   Mode: No mode
-  Standard Deviation: 4.99876527964533
+  Standard Deviation: 4.284223457888151
   Range: 13
   Outliers: 0
 
 Haley:
-  Mean: 10.88888888888889
-  Median: 12.0
+  Mean: 9.894736842105264
+  Median: 10.0
   Mode: No mode
-  Standard Deviation: 5.384018417593652
-  Range: 14
+  Standard Deviation: 5.097932881824753
+  Range: 16
   Outliers: 0
 
 Rick:
-  Mean: 9.11111111111111
+  Mean: 9.052631578947368
   Median: 12.0
   Mode: No mode
-  Standard Deviation: 5.506449641495052
+  Standard Deviation: 5.30614027836992
   Range: 14
   Outliers: 0
 
-Dee:
-  Mean: 11.555555555555555
-  Median: 13.0
-  Mode: No mode
-  Standard Deviation: 4.323350324076382
-  Range: 15
-  Outliers: 0
-
 Jason:
-  Mean: 7.555555555555555
-  Median: 6.0
+  Mean: 8.368421052631579
+  Median: 8.0
   Mode: No mode
-  Standard Deviation: 4.297573245736381
+  Standard Deviation: 4.245251543173849
   Range: 13
   Outliers: 0
 
 Barrett:
-  Mean: 9.555555555555555
-  Median: 11.0
+  Mean: 11.0
+  Median: 12.0
   Mode: No mode
-  Standard Deviation: 4.716663394842472
+  Standard Deviation: 4.167543767332454
   Range: 16
   Outliers: 0
 
-Mallory:
-  Mean: 11.555555555555555
-  Median: 10.0
+Dee:
+  Mean: 10.894736842105264
+  Median: 11.0
   Mode: No mode
-  Standard Deviation: 3.624334762288909
+  Standard Deviation: 5.200149156181714
+  Range: 16
+  Outliers: 0
+
+Angela:
+  Mean: 5.368421052631579
+  Median: 5.0
+  Mode: No mode
+  Standard Deviation: 3.730535820351442
   Range: 11
   Outliers: 0
 
 Rome:
-  Mean: 9.555555555555555
+  Mean: 9.473684210526315
   Median: 11.0
   Mode: No mode
-  Standard Deviation: 5.479479113750202
-  Range: 14
+  Standard Deviation: 5.480764651345185
+  Range: 16
   Outliers: 0
 
-Angela:
-  Mean: 6.333333333333333
-  Median: 7.0
+Mallory:
+  Mean: 11.105263157894736
+  Median: 10.0
   Mode: No mode
-  Standard Deviation: 4.0551750201988135
+  Standard Deviation: 3.8098865412323915
   Range: 11
-  Outliers: 0
-
-Drew:
-  Mean: 8.0
-  Median: 7.0
-  Mode: No mode
-  Standard Deviation: 3.2317865716108862
-  Range: 9
   Outliers: 0
 
 Chuk:
-  Mean: 7.111111111111111
-  Median: 6.0
+  Mean: 8.736842105263158
+  Median: 8.0
   Mode: No mode
-  Standard Deviation: 2.6434171674156266
-  Range: 9
-  Outliers: 0
-
-Yash:
-  Mean: 9.11111111111111
-  Median: 10.0
-  Mode: No mode
-  Standard Deviation: 3.4138425546082702
-  Range: 11
-  Outliers: 0
-
-Ashley:
-  Mean: 5.777777777777778
-  Median: 6.0
-  Mode: No mode
-  Standard Deviation: 4.130584510098023
-  Range: 13
-  Outliers: 0
-
-Melody:
-  Mean: 6.888888888888889
-  Median: 7.0
-  Mode: No mode
-  Standard Deviation: 3.784308081316978
+  Standard Deviation: 3.4768725399818408
   Range: 12
   Outliers: 0
 
+Yash:
+  Mean: 10.31578947368421
+  Median: 11.0
+  Mode: No mode
+  Standard Deviation: 4.377606069879643
+  Range: 16
+  Outliers: 0
+
+Drew:
+  Mean: 8.263157894736842
+  Median: 7.0
+  Mode: No mode
+  Standard Deviation: 4.399068146098287
+  Range: 14
+  Outliers: 0
+
+Ashley:
+  Mean: 6.894736842105263
+  Median: 6.0
+  Mode: No mode
+  Standard Deviation: 4.745022176667219
+  Range: 16
+  Outliers: 0
+
+Melody:
+  Mean: 7.473684210526316
+  Median: 7.0
+  Mode: No mode
+  Standard Deviation: 4.381401134372087
+  Range: 13
+  Outliers: 0
+
 Latrice:
-  Mean: 6.111111111111111
+  Mean: 5.7368421052631575
   Median: 4.0
   Mode: No mode
-  Standard Deviation: 4.771313456351975
+  Standard Deviation: 4.875741296007774
   Range: 16
   Outliers: 0
 
 Taylor:
-  Mean: 10.555555555555555
-  Median: 10.0
+  Mean: 9.052631578947368
+  Median: 9.0
   Mode: No mode
-  Standard Deviation: 4.54877544232416
+  Standard Deviation: 4.673257448510128
   Range: 15
   Outliers: 0
 
 Average List:
-Ashley: 5.777777777777778
-Latrice: 6.111111111111111
-Angela: 6.333333333333333
-Melody: 6.888888888888889
-Chuk: 7.111111111111111
-Jason: 7.555555555555555
-Drew: 8.0
-Rick: 9.11111111111111
-Yash: 9.11111111111111
-Barrett: 9.555555555555555
-Rome: 9.555555555555555
-Taylor: 10.555555555555555
-Haley: 10.88888888888889
-Kamu: 11.444444444444445
-Dee: 11.555555555555555
-Mallory: 11.555555555555555
-Lyric: 11.88888888888889
+Angela: 5.368421052631579
+Latrice: 5.7368421052631575
+Ashley: 6.894736842105263
+Melody: 7.473684210526316
+Drew: 8.263157894736842
+Jason: 8.368421052631579
+Chuk: 8.736842105263158
+Rick: 9.052631578947368
+Taylor: 9.052631578947368
+Rome: 9.473684210526315
+Haley: 9.894736842105264
+Yash: 10.31578947368421
+Lyric: 10.526315789473685
+Kamu: 10.842105263157896
+Dee: 10.894736842105264
+Barrett: 11.0
+Mallory: 11.105263157894736

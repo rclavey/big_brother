@@ -1,6 +1,6 @@
 name,contestant1,contestant2,contestant3,contestant4,contestant5,contestant6,contestant7,contestant8,contestant9,contestant10,contestant11,contestant12,contestant13,contestant14,contestant15,contestant16,contestant17
-Richie,Kamu,Lyric,Haley,Rick,Dee,Jason,Barrett,Angela,Rome,Mallory,Drew,Chuk,Yash,Ashley,Melody,Latrice,Taylor
-Joe,Kamu,Rome,Dee,Rick,Lyric,Yash,Barrett,Mallory,Taylor,Melody,Drew,Chuk,Latrice,Haley,Jason,Ashley,Angela
+Richie,Kamu,Lyric,Haley,Rick,Jason,Barrett,Dee,Angela,Rome,Mallory,Chuk,Yash,Drew,Ashley,Melody,Latrice,Taylor
+Joe_C,Kamu,Rome,Dee,Rick,Lyric,Yash,Barrett,Mallory,Taylor,Melody,Drew,Chuk,Latrice,Haley,Jason,Ashley,Angela
 Peggy,Kamu,Haley,Rick,Rome,Taylor,Angela,Jason,Latrice,Dee,Yash,Drew,Mallory,Chuk,Barrett,Lyric,Melody,Ashley
 Shannon,Haley,Taylor,Rome,Lyric,Dee,Kamu,Yash,Ashley,Chuk,Mallory,Melody,Barrett,Drew,Jason,Latrice,Angela,Rick
 Maggie,Barrett,Lyric,Kamu,Rick,Mallory,Dee,Angela,Yash,Taylor,Jason,Melody,Ashley,Chuk,Drew,Haley,Rome,Latrice
@@ -8,4 +8,15 @@ Karen,Mallory,Taylor,Yash,Ashley,Drew,Haley,Rome,Angela,Latrice,Dee,Rick,Jason,K
 Theresea,Latrice,Lyric,Mallory,Rome,Chuk,Drew,Kamu,Barrett,Melody,Haley,Taylor,Ashley,Jason,Yash,Rick,Dee,Angela
 Charlie,Haley,Jason,Dee,Melody,Barrett,Drew,Lyric,Taylor,Mallory,Kamu,Chuk,Yash,Angela,Latrice,Rome,Rick,Ashley
 Kirsten,Dee,Mallory,Lyric,Taylor,Barrett,Rick,Yash,Melody,Chuk,Ashley,Angela,Haley,Drew,Latrice,Jason,Rome,Kamu
+Bishan,Barrett,Latrice,Kamu,Melody,Ashley,Yash,Drew,Lyric,Mallory,Taylor,Chuk,Haley,Angela,Rick,Jason,Dee,Rome
+Bob_Shea,Yash,Chuk,Mallory,Ashley,Lyric,Barrett,Drew,Rick,Dee,Rome,Jason,Kamu,Taylor,Latrice,Angela,Melody,Haley
+Anna,Dee,Kamu,Rick,Mallory,Drew,Rome,Barrett,Lyric,Yash,Ashley,Chuk,Haley,Jason,Taylor,Melody,Angela,Latrice
+Danielle,Dee,Taylor,Melody,Barrett,Rick,Rome,Haley,Jason,Angela,Mallory,Lyric,Yash,Chuk,Kamu,Drew,Ashley,Latrice
+Sharon,Ashley,Drew,Chuk,Barrett,Rome,Melody,Haley,Taylor,Yash,Jason,Mallory,Lyric,Kamu,Latrice,Angela,Rick,Dee
+Steph,Haley,Dee,Yash,Jason,Barrett,Rick,Mallory,Angela,Ashley,Chuk,Drew,Kamu,Lyric,Rome,Melody,Latrice,Taylor
+Bern,Rome,Drew,Rick,Taylor,Jason,Kamu,Yash,Chuk,Dee,Barrett,Lyric,Mallory,Ashley,Haley,Melody,Angela,Latrice
+Caroline,Dee,Barrett,Haley,Chuk,Rick,Latrice,Kamu,Rome,Melody,Lyric,Mallory,Taylor,Angela,Jason,Drew,Ashley,Yash
+Dee_L,Mallory,Yash,Kamu,Jason,Lyric,Melody,Dee,Haley,Latrice,Chuk,Barrett,Ashley,Taylor,Rick,Angela,Drew,Rome
+Terri,Yash,Rome,Mallory,Lyric,Kamu,Jason,Chuk,Barrett,Haley,Taylor,Melody,Dee,Drew,Latrice,Ashley,Rick,Angela
 ChatGPT,Dee,Rick,Barrett,Chuk,Lyric,Jason,Taylor,Kamu,Ashley,Mallory,Haley,Melody,Angela,Latrice,Drew,Yash,Rome
+Average,Mallory,Barrett,Dee,Kamu,Lyric,Yash,Haley,Rome,Taylor,Rick,Chuk,Jason,Drew,Melody,Ashley,Latrice,Angela
