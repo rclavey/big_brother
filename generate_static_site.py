@@ -130,7 +130,7 @@ def calc_points(hoh_winners, veto_winners, off_block, other_comp_winners, evicti
         + [week + 1 for week in buy_back],
         default=0,
     )
-    weekly_scores = {player: [0] * (scored_week_count + 1 if scored_week_count else 0) for player in picks}
+    weekly_scores = {player: [0] * scored_week_count for player in picks}
     total_scores = {player: 0 for player in picks}
     points_log = []
     number_of_players = 17 # change if number of players is different than last season
