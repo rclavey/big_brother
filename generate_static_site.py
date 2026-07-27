@@ -530,18 +530,62 @@ def build_blank_season():
     }
 
 
+def build_winners_table(hoh, veto, off_block, other_comp, evictions, buy_back, fav,
+                        week_count):
+    grouped_categories = [off_block, other_comp, buy_back]
+    grouped_week_count = max(
+        (week + 1 for category in grouped_categories for week in category),
+        default=0,
+    )
+    display_week_count = max(
+        week_count,
+        len(hoh),
+        len(veto),
+        len(evictions),
+        grouped_week_count,
+        1 if fav else 0,
+    )
+
+    def pad(values):
+        return list(values) + [''] * (display_week_count - len(values))
+
+    def group_by_week(values):
+        return [', '.join(values.get(week, [])) for week in range(display_week_count)]
+
+    favorite_values = [fav] if fav else []
+    return (
+        ['Category'] + [f'Week {week + 1}' for week in range(display_week_count)],
+        [
+            ['hoh_winners'] + pad(hoh),
+            ['veto_winners'] + pad(veto),
+            ['off_block'] + group_by_week(off_block),
+            ['other_comp_winners'] + group_by_week(other_comp),
+            ['evictions'] + pad(evictions),
+            ['buy_back'] + group_by_week(buy_back),
+            ['americas_favorite'] + pad(favorite_values),
+        ],
+    )
+
+
 def build_season(season_id, label, picks_file, winners_file, points_file, log_file=None,
                  status='Archived season', is_archive=True):
     picks_headers, picks = read_picks_from_csv(picks_file)
     points_headers, points_data = read_points_from_csv(points_file)
     weekly_scores, total_scores = points_rows_to_scores(points_data)
-    winners_raw = read_raw_data_from_csv(winners_file)
     hoh, veto, off_block, other_comp, evictions, buy_back, fav = read_winners_from_csv(winners_file)
 
     week_count = len(next(iter(weekly_scores.values()), [])) if weekly_scores else 0
     week_labels = [f'Week {i+1}' for i in range(week_count)]
-    winners_headers = ['Category'] + [f'Week {i+1}' for i in range(max((len(row) for row in winners_raw), default=1) - 1)]
-    winners_data = [[row[0]] + row[1:] for row in winners_raw]
+    winners_headers, winners_data = build_winners_table(
+        hoh,
+        veto,
+        off_block,
+        other_comp,
+        evictions,
+        buy_back,
+        fav,
+        week_count,
+    )
     logs = read_logs_from_csv(log_file) if log_file and os.path.exists(log_file) else {}
     player_chart_data = build_player_chart_data(weekly_scores, total_scores)
 
