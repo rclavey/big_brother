@@ -61,10 +61,11 @@ def read_winners_from_csv(filename):
         reader = csv.reader(file)
         data = list(reader)
 
-    def row_values(index):
+    def row_values(index, preserve_empty=False):
         if index >= len(data):
             return []
-        return [x.strip() for x in data[index][1:] if x.strip()]
+        values = [x.strip() for x in data[index][1:]]
+        return values if preserve_empty else [x for x in values if x]
 
     def parse_week_pairs(values):
         parsed = {}
@@ -78,7 +79,8 @@ def read_winners_from_csv(filename):
         return parsed
 
     hoh_winners = row_values(0)
-    veto_winners = row_values(1)
+    # An empty value reserves a scoring week where no Veto was played.
+    veto_winners = row_values(1, preserve_empty=True)
     off_block_values = row_values(2)
     off_block = parse_week_pairs(off_block_values)
     if not off_block and off_block_values:
